@@ -2,203 +2,412 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Álbum de Cromos Digital</title>
-    <!-- SDK de Firebase para el Servidor Anti-Trampas -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mi Álbum de Emojis Pastel</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     
     <style>
         :root {
-            --panini-blue: #0033a0;
-            --panini-red: #e31837;
-            --page-bg: #fdfbf7;
-            --text: #333;
+            --pastel-blue: #b3cde3;
+            --pastel-blue-dark: #8da0cb;
+            --pastel-pink: #fbb4ae;
+            --pastel-pink-dark: #e41a1c;
+            --pastel-green: #ccebc5;
+            --pastel-yellow: #ffffcc;
+            --pastel-purple: #decbe4;
+            --pastel-orange: #fed9a6;
+            --bg-app: #f4f7f6;
+            --text-main: #4a5568;
+            --card-bg: #ffffff;
+            --radius-lg: 20px;
+            --radius-md: 12px;
+            --radius-sm: 8px;
         }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
         body {
-            font-family: 'Helvetica Neue', Arial, sans-serif;
-            background-color: #2c3e50;
-            color: var(--text);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-app);
+            color: var(--text-main);
             margin: 0;
             padding: 0;
-            padding-bottom: 80px;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            overflow-x: hidden;
         }
+
         header {
-            background: var(--panini-blue);
-            color: white;
+            background: var(--card-bg);
+            padding: 15px;
             text-align: center;
-            padding: 1rem;
-            border-bottom: 4px solid var(--panini-red);
+            border-bottom: 2px solid #e2e8f0;
+            border-bottom-left-radius: var(--radius-lg);
+            border-bottom-right-radius: var(--radius-lg);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
-        .container { display: none; max-width: 900px; margin: 0 auto; padding: 1rem; }
-        .container.active { display: block; }
-        
-        /* Navegación inferior */
-        nav {
-            position: fixed; bottom: 0; width: 100%;
-            background: white; display: flex; justify-content: space-around;
-            padding: 10px 0; box-shadow: 0 -2px 10px rgba(0,0,0,0.3); z-index: 1000;
-        }
-        nav button {
-            background: none; border: none; font-size: 0.9rem; color: #666;
-            display: flex; flex-direction: column; align-items: center; cursor: pointer;
-        }
-        nav button.active { color: var(--panini-blue); font-weight: bold; }
-        nav button span { font-size: 1.5rem; margin-bottom: 2px; }
 
-        /* Estilo Libro (Álbum Panini) */
-        .album-header {
-            display: flex; justify-content: space-between; align-items: center;
-            background: white; padding: 10px 20px; border-radius: 8px; margin-bottom: 15px;
+        header h1 {
+            margin: 0;
+            font-size: 1.4rem;
+            color: #2d3748;
+            font-weight: 700;
         }
-        .album-header button {
-            background: var(--panini-red); color: white; border: none;
-            padding: 10px 15px; border-radius: 5px; cursor: pointer; font-weight: bold;
+
+        .stats-badge {
+            display: inline-block;
+            background: var(--pastel-blue);
+            padding: 6px 16px;
+            border-radius: var(--radius-lg);
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-top: 8px;
+            color: #2b6cb0;
         }
-        .book {
-            display: flex; flex-wrap: wrap; gap: 0;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5); border-radius: 4px;
-            background: #111; padding: 5px;
+
+        /* Contenedores a pantalla completa */
+        .container {
+            display: none;
+            flex: 1;
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            padding-bottom: 100px;
         }
-        .page {
-            flex: 1; min-width: 300px; background: var(--page-bg);
-            padding: 20px; position: relative; box-sizing: border-box;
+
+        .container.active {
+            display: block;
         }
-        .page.left { border-right: 2px solid #ccc; box-shadow: inset -10px 0 20px rgba(0,0,0,0.05); }
-        .page.right { box-shadow: inset 10px 0 20px rgba(0,0,0,0.05); }
-        .page-title {
-            text-align: center; color: var(--panini-blue); font-size: 1.2rem;
-            margin-top: 0; margin-bottom: 20px; text-transform: uppercase; border-bottom: 2px solid var(--panini-red);
+
+        /* Estilo Tarjetas Pastel */
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.02);
+            border: 1px solid #edf2f7;
         }
-        
-        /* Cromos y Huecos */
+
+        .card h2 {
+            margin-top: 0;
+            font-size: 1.15rem;
+            color: #2d3748;
+            border-left: 5px solid var(--pastel-blue-dark);
+            padding-left: 10px;
+        }
+
+        /* Controles de Categoría */
+        .album-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .btn-nav {
+            background: var(--pastel-blue);
+            border: none;
+            padding: 10px 18px;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            font-weight: 600;
+            color: #2b6cb0;
+            transition: background 0.2s;
+        }
+
+        .btn-nav:active { background: #cbd5e0; }
+
+        .cat-title {
+            font-weight: 700;
+            font-size: 1.1rem;
+            background: white;
+            padding: 8px 16px;
+            border-radius: var(--radius-lg);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+        }
+
+        .badge-alert {
+            background: var(--pastel-orange);
+            color: #c05621;
+            padding: 6px 14px;
+            border-radius: var(--radius-lg);
+            font-size: 0.85rem;
+            text-align: center;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        /* Cuadrícula de Cromos */
         .sticker-grid {
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
         }
+
         .slot {
-            aspect-ratio: 2/3; background: #e0e0e0; border: 1px dashed #999;
-            display: flex; align-items: center; justify-content: center;
-            position: relative; border-radius: 4px; cursor: pointer;
+            aspect-ratio: 3/4;
+            background: #f7fafc;
+            border: 2px dashed #cbd5e0;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.2s;
         }
+
         .slot-number {
-            position: absolute; top: 5px; left: 5px; font-size: 0.8rem; color: #666; font-weight: bold;
+            position: absolute;
+            top: 6px;
+            left: 6px;
+            font-size: 0.75rem;
+            color: #a0aec0;
+            font-weight: 700;
         }
+
         .sticker {
-            width: 100%; height: 100%; background: white; border-radius: 4px;
-            display: flex; align-items: center; justify-content: center; font-size: 3rem;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2); border: 2px solid white;
-            animation: paste 0.3s ease-out forwards;
+            width: 100%;
+            height: 100%;
+            background: var(--card-bg);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.06);
+            border: 3px solid white;
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        .slot.can-paste { border: 2px solid #2ecc71; background: #d5f5e3; animation: pulse 1.5s infinite; }
-        
-        @keyframes paste { 0% { transform: scale(1.5) rotate(10deg); opacity: 0; } 100% { transform: scale(1) rotate(0); opacity: 1; } }
-        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(46, 204, 113, 0); } 100% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); } }
 
-        /* Sobres */
-        .pack-area { text-align: center; color: white; margin-top: 40px; }
-        .pack {
-            width: 160px; height: 220px; background: linear-gradient(135deg, var(--panini-blue), #0056b3);
-            margin: 20px auto; border-radius: 10px; border: 4px solid white;
-            display: flex; align-items: center; justify-content: center; font-size: 4rem;
-            cursor: pointer; box-shadow: 0 10px 20px rgba(0,0,0,0.4); transition: transform 0.2s;
+        .slot.can-paste {
+            border: 2px solid var(--pastel-green);
+            background: #e6fffa;
+            animation: pulseGlow 1.5s infinite;
         }
-        .pack:active { transform: scale(0.95); }
-        .unpasted-info { background: #f39c12; color: white; padding: 5px 15px; border-radius: 20px; font-size: 0.9rem; display: inline-block; margin-top: 10px; }
 
-        /* Modal Apertura */
+        @keyframes popIn {
+            0% { transform: scale(0.6) rotate(-10deg); opacity: 0; }
+            100% { transform: scale(1) rotate(0); opacity: 1; }
+        }
+
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 0 0 rgba(181, 234, 215, 0.7); }
+            70% { box-shadow: 0 0 0 8px rgba(181, 234, 215, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(181, 234, 215, 0); }
+        }
+
+        /* Formulario y Botones */
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #e2e8f0;
+            border-radius: var(--radius-md);
+            background: #f7fafc;
+            color: var(--text-main);
+            font-size: 0.95rem;
+        }
+
+        .btn-main {
+            background: var(--pastel-blue);
+            color: #2b6cb0;
+            border: none;
+            padding: 14px;
+            border-radius: var(--radius-md);
+            font-weight: 700;
+            width: 100%;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background 0.2s;
+        }
+        .btn-main:active { background: #cbd5e0; }
+
+        /* Área de Sobres */
+        .pack-wrapper {
+            text-align: center;
+            padding: 40px 10px;
+        }
+
+        .pack-visual {
+            width: 150px;
+            height: 210px;
+            background: linear-gradient(135deg, var(--pastel-purple), var(--pastel-blue));
+            margin: 20px auto;
+            border-radius: var(--radius-lg);
+            border: 5px solid white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+            transition: transform 0.2s;
+        }
+        .pack-visual:active { transform: scale(0.92); }
+
+        /* Modal de Apertura */
         #pack-modal {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9); z-index: 2000; flex-direction: column;
-            align-items: center; justify-content: center;
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            z-index: 2000;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
         }
-        .cards-reveal { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; max-width: 90%; }
-        .card-revealed {
-            width: 90px; height: 135px; background: white; border-radius: 5px;
-            display: flex; align-items: center; justify-content: center; font-size: 3.5rem;
-            box-shadow: 0 0 15px rgba(255,255,255,0.2); animation: drop 0.5s ease-out;
-        }
-        @keyframes drop { 0% { transform: translateY(-100px) scale(0); } 100% { transform: translateY(0) scale(1); } }
-        .btn-close { margin-top: 30px; padding: 15px 30px; background: var(--panini-red); color: white; border: none; border-radius: 5px; font-size: 1.2rem; cursor: pointer; }
 
-        /* Intercambio */
-        .trade-box { background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        input, select, textarea { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-        .btn-action { background: var(--panini-blue); color: white; border: none; padding: 12px; border-radius: 5px; cursor: pointer; font-weight: bold; width: 100%; }
+        .reveal-container {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 30px 0;
+        }
+
+        .card-revealed {
+            width: 85px;
+            height: 120px;
+            background: white;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+            border: 3px solid var(--pastel-blue);
+            animation: dropAnim 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+        }
+
+        @keyframes dropAnim {
+            0% { transform: translateY(-50px) scale(0.5); opacity: 0; }
+            100% { transform: translateY(0) scale(1); opacity: 1; }
+        }
+
+        /* Barra navegación inferior de App */
+        nav {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0 cubic-bezier(0.075, 0.82, 0.165, 1);
+            border-top: 1px solid #edf2f7;
+            border-top-left-radius: var(--radius-lg);
+            border-top-right-radius: var(--radius-lg);
+            box-shadow: 0 -4px 16px rgba(0,0,0,0.04);
+            z-index: 1000;
+        }
+
+        nav button {
+            background: none;
+            border: none;
+            font-size: 0.8rem;
+            color: #a0aec0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            font-weight: 600;
+            width: 33%;
+        }
+
+        nav button.active {
+            color: #2b6cb0;
+        }
+
+        nav button span {
+            font-size: 1.4rem;
+            margin-bottom: 4px;
+            opacity: 0.6;
+        }
+
+        nav button.active span {
+            opacity: 1;
+        }
     </style>
 </head>
 <body>
 
     <header>
-        <h1>🏆 Álbum Digital Emojis</h1>
-        <div id="stats" style="font-size: 0.9rem;">Colección: 0/225 pegados</div>
+        <h1>🏆 Mi Álbum de Emojis</h1>
+        <div class="stats-badge" id="global-stats">Progreso: 0/225</div>
     </header>
 
-    <!-- ÁLBUM -->
     <div id="tab-album" class="container active">
-        <div class="album-header">
-            <button onclick="prevCategory()">◀ Anterior</button>
-            <span id="cat-title" style="font-weight: bold; font-size: 1.2rem;">Cargando...</span>
-            <button onclick="nextCategory()">Siguiente ▶</button>
+        <div class="album-nav">
+            <button class="btn-nav" onclick="changeCategory(-1)">◀</button>
+            <span class="cat-title" id="display-cat">Cargando...</span>
+            <button class="btn-nav" onclick="changeCategory(1)">▶</button>
         </div>
-        <div style="text-align: center; margin-bottom: 10px;">
-            <div class="unpasted-info" id="unpasted-counter">Tienes 0 cromos sin pegar en esta categoría</div>
-        </div>
-        
-        <div class="book">
-            <div class="page left">
-                <h3 class="page-title" id="title-left">Pág 1</h3>
-                <div class="sticker-grid" id="grid-left"></div>
-            </div>
-            <div class="page right">
-                <h3 class="page-title" id="title-right">Pág 2</h3>
-                <div class="sticker-grid" id="grid-right"></div>
-            </div>
-        </div>
+        <div class="badge-alert" id="alert-category">No tienes cromos nuevos aquí.</div>
+        <div class="sticker-grid" id="album-grid"></div>
     </div>
 
-    <!-- SOBRES -->
     <div id="tab-packs" class="container">
-        <div class="pack-area">
-            <h2 id="packs-info">2 Sobres Disponibles Hoy</h2>
-            <div class="pack" id="pack-btn" onclick="openPack()">📦</div>
-            <p>Vuelve mañana para conseguir más sobres gratis.</p>
+        <div class="card pack-wrapper">
+            <h2 style="border:none; text-align:center; padding:0;" id="pack-headline">Buscando sobres...</h2>
+            <div class="pack-visual" id="pack-element" onclick="openPack()">📦</div>
+            <p style="color:#718096; font-size:0.9rem;">Los sobres se recargan automáticamente cada día de forma gratuita.</p>
         </div>
     </div>
 
-    <!-- INTERCAMBIO -->
     <div id="tab-trade" class="container">
-        <div class="trade-box">
-            <h2>📤 Dar Cromo (Crear Código)</h2>
-            <p>Selecciona un cromo repetido para subirlo al servidor y generar un código de un solo uso.</p>
-            <select id="duplicate-select"></select>
-            <button class="btn-action" onclick="generateSecureCode()">Generar Código Seguro</button>
-            <textarea id="generated-code" rows="2" readonly placeholder="Tu código aparecerá aquí..."></textarea>
+        <div class="card" style="background: #edf4f9;">
+            <h2>💾 Guardado Local (Anti-Caché)</h2>
+            <p style="font-size:0.85rem; color:#4a5568;">Genera un código de texto para guardar tus datos fuera del navegador por si borras el historial.</p>
+            
+            <button class="btn-main" style="background: var(--pastel-purple); color:#6b46c1;" onclick="exportBackupCode()">Generar Código de Guardado</button>
+            <textarea id="output-backup-box" rows="2" readonly placeholder="Tu código de seguridad saldrá aquí..." onclick="this.select()"></textarea>
+            
+            <hr style="border:0; border-top:1px solid #cbd5e0; margin:15px 0;">
+            
+            <input type="text" id="input-backup-box" placeholder="Pega aquí tu código guardado...">
+            <button class="btn-main" style="background: var(--pastel-green); color:#22543d;" onclick="importBackupCode()">Cargar Código Guardado</button>
         </div>
 
-        <div class="trade-box">
-            <h2>📥 Recibir Cromo (Canjear)</h2>
-            <p>Pega el código único que te pasó tu amigo. El servidor lo validará y lo destruirá al instante para evitar trampas.</p>
-            <input type="text" id="redeem-code" placeholder="Pega el código único aquí...">
-            <button class="btn-action" style="background: var(--panini-red);" onclick="redeemSecureCode()">Canjear en Servidor</button>
+        <div class="card">
+            <h2>📤 Dar Cromo (Generar Código)</h2>
+            <select id="select-duplicates"></select>
+            <button class="btn-main" onclick="uploadTradeToServer()">Subir y Crear Código Seguro</button>
+            <textarea id="output-server-code" rows="2" readonly placeholder="Código seguro de un solo uso..."></textarea>
+        </div>
+
+        <div class="card">
+            <h2>📥 Recibir Cromo (Canjear Código)</h2>
+            <input type="text" id="input-server-code" placeholder="Pega el código 'E-...' de tu amigo">
+            <button class="btn-main" style="background: var(--pastel-pink); color:#742a2a;" onclick="redeemTradeFromServer()">Validar en Servidor</button>
         </div>
     </div>
 
-    <!-- Navegación -->
     <nav>
-        <button id="btn-album" class="active" onclick="switchTab('album')"><span>📖</span>Álbum</button>
-        <button id="btn-packs" onclick="switchTab('packs')"><span>📦</span>Sobres</button>
-        <button id="btn-trade" onclick="switchTab('trade')"><span>🤝</span>Cambios</button>
+        <button id="nav-album" class="active" onclick="navigateTo('album')"><span>📖</span>Álbum</button>
+        <button id="nav-packs" onclick="navigateTo('packs')"><span>📦</span>Sobres</button>
+        <button id="nav-trade" onclick="navigateTo('trade')"><span>⚙️</span>Ajustes</button>
     </nav>
 
-    <!-- Modal Apertura -->
     <div id="pack-modal">
-        <h2 style="color:white; margin-bottom: 20px;">¡Tus nuevos cromos!</h2>
-        <div class="cards-reveal" id="cards-reveal"></div>
-        <button class="btn-close" onclick="closePack()">Ir a pegar al álbum</button>
+        <h2 style="color:#2d3748; font-weight:800; margin:0;">¡Sobre Abierto!</h2>
+        <div class="reveal-container" id="reveal-zone"></div>
+        <button class="btn-main" style="max-width:250px;" onclick="closePackModal()">Guardar en el álbum</button>
     </div>
 
     <script>
-        // --- CREDENCIALES OBTENIDAS DE TU CAPTURA DE PANTALLA image_331c40.png ---
+        // --- CONFIGURACIÓN DE TU BASE DE DATOS DE LA CAPTURA ---
         const firebaseConfig = {
             apiKey: "AIzaSyAxqCOJmNhaa0DCTgweiQE3sbYHC7qkc0",
             authDomain: "album-emojis.firebaseapp.com",
@@ -209,232 +418,282 @@
             appId: "1:921942628004:web:76e5c378a8ab56d20ab831"
         };
 
-        // Inicialización del sistema de base de datos
         firebase.initializeApp(firebaseConfig);
-        const dbRef = firebase.database();
+        const serverDB = firebase.database();
 
-        // --- BASE DE DATOS DE EMOJIS (15 Categorías x 15 Emojis = 225) ---
-        const rawData = {
-            "😀_Caras": "😀,😂,🥰,😎,😭,😡,🤔,😴,🥳,🤯,🥶,😱,🤫,🤓,🤠",
-            "🐶_Animales": "🐶,🐱,🐭,🐹,🐰,🦊,🐻,🐼,🐨,🐯,🦁,🐮,🐷,🐸,🐵",
-            "🍎_Frutas": "🍎,🍐,🍊,🍋,🍌,🍉,🍇,🍓,🍈,🍒,🍑,🥭,🍍,🥥,🥝",
-            "🍔_Comida": "🍔,🍟,🍕,🌭,🍿,🥓,🥞,🧇,🧀,🥗,🌮,🌯,🍜,🍣,🧁",
-            "⚽_Deportes": "⚽,🏀,🏈,⚾,🎾,🏐,🏉,🎱,🏓,🏸,🥊,🥋,🛹,⛸️,⛷️",
-            "🚗_Vehículos": "🚗,🚕,🚙,🚌,🚓,🚑,🚒,🚜,🛵,🚲,🚂,✈️,🚀,🚁,⛵",
-            "🌍_Lugares": "🌍,🌋,🗻,🏕️,🏖️,🏜️,🏝️,🏙️,🏚️,🏰,🏟️,🎡,🎢,⛲,⛩️",
-            "☀️_Clima": "☀️,⛅,☁️,🌦️,🌧️,⛈️,🌩️,🌨️,❄️,☃️,🌬️,💨,🌪️,🌫️,🌈",
-            "❤️_Corazones": "❤️,🧡,💛,💚,💙,💜,🖤,🤍,🤎,💔,❣️,💕,💞,💓,💖",
-            "👕_Ropa": "👕,👖,👔,👗,👙,👘,🥻,🧥,🦺,👟,👞,🥾,👠,🧦,🧤",
-            "🎸_Música": "🎸,🎹,🎺,🎻,🪕,🥁,🎷,🪘,🎤,🎧,📻,🎷,🎵,🎶,🎼",
-            "🔨_Herramientas": "🔨,🪓,⛏️,⚒️,🛠️,🗡️,⚔️,🔫,🏹,🛡️,🔧,🪛,🔩,🗜️,⚙️",
-            "👽_Monstruos": "👽,👾,🤖,🎃,👹,👺,👻,💀,☠️,🧟,🧛,🧜,🧚,🧞,🧝",
-            "🛑_Símbolos": "🛑,⛔,☢️,☣️,⬆️,⬇️,➡️,⬅️,❓,❕,♻️,🔱,💯,💢,💬",
-            "🪐_Espacio": "🌍,🌕,🌖,🌗,🌘,🌑,🌒,🌓,🌔,🌙,🪐,💫,⭐,🌟,✨"
+        // Estructura interna de cromos (225 en total)
+        const categoriesData = {
+            "Caras": "😀,😂,🥰,😎,😭,😡,🤔,😴,🥳,🤯,🥶,😱,🤫,🤓,🤠",
+            "Animales": "🐶,🐱,🐭,🐹,🐰,🦊,🐻,🐼,🐨,🐯,🦁,🐮,🐷,🐸,🐵",
+            "Frutas": "🍎,🍐,🍊,🍋,🍌,🍉,🍇,🍓,🍈,🍒,🍑,🥭,🍍,🥥,🥝",
+            "Comida": "🍔,🍟,🍕,🌭,🍿,🥓,🥞,🧇,🧀,🥗,🌮,🌯,🍜,🍣,🧁",
+            "Deportes": "⚽,🏀,🏈,⚾,🎾,🏐,🏉,🎱,🏓,🏸,🥊,🥋,🛹,⛸️,⛷️",
+            "Vehículos": "🚗,🚕,🚙,🚌,🚓,🚑,🚒,🚜,🛵,🚲,🚂,✈️,🚀,🚁,⛵",
+            "Lugares": "🌍,🌋,🗻,🏕️,🏖️,🏜️,🏝️,🏙️,🏚️,🏰,🏟️,🎡,🎢,⛲,⛩️",
+            "Clima": "☀️,⛅,☁️,🌦️,🌧️,⛈️,🌩️,🌨️,❄️,☃️,🌬️,💨,🌪️,🌫️,🌈",
+            "Corazones": "❤️,🧡,💛,💚,💙,💜,🖤,🤍,🤎,💔,❣️,💕,💞,💓,💖",
+            "Ropa": "👕,👖,👔,👗,👙,👘,🥻,🧥,🦺,👟,👞,🥾,👠,🧦,🧤",
+            "Música": "🎸,🎹,🎺,🎻,🪕,🥁,🎷,🪘,🎤,🎧,📻,🎷,🎵,🎶,🎼",
+            "Herramientas": "🔨,🪓,⛏️,⚒️,🛠️,🗡️,⚔️,🔫,🏹,🛡️,🔧,🪛,🔩,🗜️,⚙️",
+            "Monstruos": "👽,👾,🤖,🎃,👹,👺,👻,💀,☠️,🧟,🧛,🧜,🧚,🧞,🧝",
+            "Símbolos": "🛑,⛔,☢️,☣️,⬆️,⬇️,➡️,⬅️,❓,❕,♻️,🔱,💯,💢,💬",
+            "Espacio": "🌍,🌕,🌖,🌗,🌘,🌑,🌒,🌓,🌔,🌙,🪐,💫,⭐,🌟,✨"
         };
 
-        const db = [];
-        const categories = [];
-        let currentCatIndex = 0;
-        let idCount = 1;
+        const stickerList = [];
+        const categoryNames = Object.keys(categoriesData);
+        let activeCatIndex = 0;
+        let globalCounter = 1;
 
-        for (let [cat, emojis] of Object.entries(rawData)) {
-            let [icon, name] = cat.split('_');
-            categories.push({ name, icon });
-            emojis.split(',').forEach(e => {
-                db.push({ id: idCount++, cat: name, icon: icon, emoji: e });
+        for (let [cat, items] of Object.entries(categoriesData)) {
+            items.split(',').forEach(emoji => {
+                stickerList.push({ id: globalCounter++, category: cat, char: emoji });
             });
         }
 
-        // --- SISTEMA DE GUARDADO LOCAL (ESTADO) ---
-        let state = {
-            inventory: {}, 
-            pasted: {},    
-            lastDate: '',
-            packsToday: 2
-        };
+        // Estado del usuario
+        let state = { inventory: {}, pasted: {}, lastOpenedDay: '', packsCount: 2 };
 
-        function loadLocal() {
-            let s = localStorage.getItem('paniniAlbumSecure');
-            if(s) state = JSON.parse(s);
+        function loadState() {
+            let local = localStorage.getItem('emoji_album_pastel_save');
+            if (local) state = JSON.parse(local);
             let today = new Date().toDateString();
-            if (state.lastDate !== today) { state.lastDate = today; state.packsToday = 2; saveLocal(); }
-            updateStats();
-        }
-        function saveLocal() { localStorage.setItem('paniniAlbumSecure', JSON.stringify(state)); updateStats(); }
-
-        function updateStats() {
-            let pastedCount = Object.keys(state.pasted).filter(k => state.pasted[k]).length;
-            document.getElementById('stats').innerText = `Colección: ${pastedCount}/225 pegados`;
-        }
-
-        // --- NAVEGACIÓN ---
-        function switchTab(tab) {
-            document.querySelectorAll('.container').forEach(c => c.classList.remove('active'));
-            document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
-            document.getElementById('tab-' + tab).classList.add('active');
-            document.getElementById('btn-' + tab).classList.add('active');
-            
-            if(tab === 'album') renderAlbum();
-            if(tab === 'packs') renderPacks();
-            if(tab === 'trade') renderTrade();
-        }
-
-        function prevCategory() { if(currentCatIndex > 0) { currentCatIndex--; renderAlbum(); } }
-        function nextCategory() { if(currentCatIndex < categories.length - 1) { currentCatIndex++; renderAlbum(); } }
-
-        // --- RENDERIZADO DEL ÁLBUM ---
-        function renderAlbum() {
-            let cat = categories[currentCatIndex];
-            document.getElementById('cat-title').innerText = `${cat.icon} ${cat.name}`;
-            
-            let catCards = db.filter(c => c.cat === cat.name);
-            let leftCards = catCards.slice(0, 8); 
-            let rightCards = catCards.slice(8, 15); 
-
-            let unpastedCat = catCards.filter(c => state.inventory[c.id] > 0 && !state.pasted[c.id]).length;
-            document.getElementById('unpasted-counter').innerText = unpastedCat > 0 
-                ? `¡Tienes ${unpastedCat} cromos listos para pegar en esta sección!` 
-                : "No tienes cromos nuevos para estas páginas.";
-            document.getElementById('unpasted-counter').style.background = unpastedCat > 0 ? '#2ecc71' : '#f39c12';
-
-            document.getElementById('grid-left').innerHTML = leftCards.map(c => generateSlot(c)).join('');
-            document.getElementById('grid-right').innerHTML = rightCards.map(c => generateSlot(c)).join('');
-        }
-
-        function generateSlot(cromo) {
-            let isPasted = state.pasted[cromo.id];
-            let qty = state.inventory[cromo.id] || 0;
-            let canPaste = !isPasted && qty > 0;
-            
-            if (isPasted) {
-                return `<div class="slot"><div class="sticker">${cromo.emoji}</div></div>`;
-            } else if (canPaste) {
-                return `<div class="slot can-paste" onclick="pasteCromo(${cromo.id})">
-                            <span class="slot-number">${cromo.id}</span>
-                            <span style="font-size:2rem; opacity:0.35;">${cromo.emoji}</span>
-                        </div>`;
-            } else {
-                return `<div class="slot"><span class="slot-number">${cromo.id}</span></div>`;
+            if (state.lastOpenedDay !== today) {
+                state.lastOpenedDay = today;
+                state.packsCount = 2;
+                saveState();
             }
+            refreshGlobalCounters();
         }
 
-        function pasteCromo(id) {
+        function saveState() {
+            localStorage.setItem('emoji_album_pastel_save', JSON.stringify(state));
+            refreshGlobalCounters();
+        }
+
+        function refreshGlobalCounters() {
+            let totalPasted = Object.keys(state.pasted).filter(id => state.pasted[id]).length;
+            document.getElementById('global-stats').innerText = `Progreso: ${totalPasted}/225`;
+        }
+
+        // Navegación entre pestañas fijas superiores
+        function navigateTo(tabName) {
+            document.querySelectorAll('.container').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('nav button').forEach(el => el.classList.remove('active'));
+            
+            document.getElementById('tab-' + tabName).classList.add('active');
+            document.getElementById('nav-' + tabName).classList.add('active');
+
+            if(tabName === 'album') buildAlbumView();
+            if(tabName === 'packs') buildPacksView();
+            if(tabName === 'trade') buildTradeView();
+        }
+
+        function changeCategory(direction) {
+            activeCatIndex += direction;
+            if(activeCatIndex < 0) activeCatIndex = categoryNames.length - 1;
+            if(activeCatIndex >= categoryNames.length) activeCatIndex = 0;
+            buildAlbumView();
+        }
+
+        // Renderizado Dinámico del Álbum
+        function buildAlbumView() {
+            let currentCat = categoryNames[activeCatIndex];
+            document.getElementById('display-cat').innerText = currentCat;
+
+            let catStickers = stickerList.filter(s => s.category === currentCat);
+            let checkUnpasted = catStickers.filter(s => state.inventory[s.id] > 0 && !state.pasted[s.id]).length;
+
+            let badge = document.getElementById('alert-category');
+            if(checkUnpasted > 0) {
+                badge.innerText = `¡Tienes ${checkUnpasted} cromo(s) listos para pegar en esta página!`;
+                badge.style.background = "var(--pastel-green)";
+                badge.style.color = "#22543d";
+            } else {
+                badge.innerText = "No tienes cromos nuevos aquí.";
+                badge.style.background = "var(--pastel-orange)";
+                badge.style.color = "#c05621";
+            }
+
+            let grid = document.getElementById('album-grid');
+            grid.innerHTML = catStickers.map(s => {
+                let isPasted = state.pasted[s.id];
+                let hasInInventory = state.inventory[s.id] || 0;
+
+                if (isPasted) {
+                    return `<div class="slot"><div class="sticker">${s.char}</div></div>`;
+                } else if (!isPasted && hasInInventory > 0) {
+                    return `<div class="slot can-paste" onclick="pasteAction(${s.id})">
+                                <span class="slot-number">${s.id}</span>
+                                <span style="font-size:1.8rem; opacity:0.25;">${s.char}</span>
+                            </div>`;
+                } else {
+                    return `<div class="slot"><span class="slot-number">${s.id}</span></div>`;
+                }
+            }).join('');
+        }
+
+        function pasteAction(id) {
             state.pasted[id] = true;
-            saveLocal();
-            renderAlbum();
+            saveState();
+            buildAlbumView();
         }
 
-        // --- SISTEMA DE SOBRES ---
-        function renderPacks() {
-            document.getElementById('packs-info').innerText = state.packsToday > 0 ? `Tienes ${state.packsToday} sobres disponibles hoy` : `Vuelve mañana para abrir más sobres`;
-            document.getElementById('pack-btn').style.opacity = state.packsToday > 0 ? '1' : '0.4';
+        // Sistema de sobres
+        function buildPacksView() {
+            let headline = document.getElementById('pack-headline');
+            let element = document.getElementById('pack-element');
+            if (state.packsCount > 0) {
+                headline.innerText = `¡Tienes ${state.packsCount} sobre(s) disponible(s) hoy!`;
+                element.style.opacity = "1";
+            } else {
+                headline.innerText = "No te quedan sobres. ¡Vuelve mañana!";
+                element.style.opacity = "0.35";
+            }
         }
 
         function openPack() {
-            if (state.packsToday <= 0) return alert('No te quedan sobres por hoy.');
-            state.packsToday--;
-            saveLocal();
-            renderPacks();
+            if (state.packsCount <= 0) return;
+            state.packsCount--;
+            saveState();
+            buildPacksView();
 
-            let modal = document.getElementById('cards-reveal');
-            modal.innerHTML = '';
-            
-            for(let i=0; i<5; i++) {
-                let randomCromo = db[Math.floor(Math.random() * db.length)];
-                state.inventory[randomCromo.id] = (state.inventory[randomCromo.id] || 0) + 1;
+            let zone = document.getElementById('reveal-zone');
+            zone.innerHTML = '';
+
+            for (let i = 0; i < 5; i++) {
+                let randomItem = stickerList[Math.floor(Math.random() * stickerList.length)];
+                state.inventory[randomItem.id] = (state.inventory[randomItem.id] || 0) + 1;
                 
                 setTimeout(() => {
-                    modal.innerHTML += `<div class="card-revealed">${randomCromo.emoji}</div>`;
-                }, i * 250);
+                    zone.innerHTML += `<div class="card-revealed">${randomItem.char}</div>`;
+                }, i * 200);
             }
-            saveLocal();
+            saveState();
             document.getElementById('pack-modal').style.display = 'flex';
         }
 
-        function closePack() {
+        function closePackModal() {
             document.getElementById('pack-modal').style.display = 'none';
-            switchTab('album');
+            navigateTo('album');
         }
 
-        // --- SISTEMA DE INTERCAMBIO SEGURO (ONLINE) ---
-        function renderTrade() {
-            let select = document.getElementById('duplicate-select');
+        // =========================================================
+        // ⭐ SISTEMA NUEVO: COPIA DE SEGURIDAD LOCAL (SIN FIREBASE) ⭐
+        // =========================================================
+        function exportBackupCode() {
+            try {
+                // Convertimos el objeto completo a texto comprimido en Base64
+                let dataString = JSON.stringify(state);
+                let encoded = btoa(unescape(encodeURIComponent(dataString)));
+                
+                document.getElementById('output-backup-box').value = encoded;
+                alert("¡Código de seguridad generado! Copia el texto y guárdalo en tus notas. Te servirá si borras la caché.");
+            } catch (err) {
+                alert("Error al empaquetar tus datos.");
+            }
+        }
+
+        function importBackupCode() {
+            let inputField = document.getElementById('input-backup-box');
+            let rawCode = inputField.value.trim();
+            if (!rawCode) return alert("Por favor, pega primero el código de respaldo.");
+
+            try {
+                let decodedString = decodeURIComponent(escape(atob(rawCode)));
+                let parsedState = JSON.parse(decodedString);
+
+                if (parsedState.inventory && parsedState.pasted) {
+                    state = parsedState;
+                    saveState();
+                    buildAlbumView();
+                    inputField.value = '';
+                    alert("¡Álbum restaurado con éxito! Tus cromos se han cargado correctamente.");
+                } else {
+                    alert("El código ingresado no contiene una copia válida.");
+                }
+            } catch(e) {
+                alert("Código inválido. Asegúrate de haberlo copiado de forma completa y exacta.");
+            }
+        }
+
+        // =========================================================
+        // INTERCAMBIOS ONLINE MEDIANTE TU SERVIDOR FIREBASE
+        // =========================================================
+        function buildTradeView() {
+            let select = document.getElementById('select-duplicates');
             select.innerHTML = '';
-            let validDuplicates = db.filter(c => (state.inventory[c.id] || 0) > (state.pasted[c.id] ? 1 : 0));
+            
+            let duplicates = stickerList.filter(s => (state.inventory[s.id] || 0) > (state.pasted[s.id] ? 1 : 0));
 
-            if (validDuplicates.length === 0) {
-                select.innerHTML = '<option value="">No tienes repetidos para cambiar.</option>';
+            if(duplicates.length === 0) {
+                select.innerHTML = '<option value="">No tienes cromos repetidos</option>';
             } else {
-                validDuplicates.forEach(c => {
-                    let qtyToTrade = state.inventory[c.id] - (state.pasted[c.id] ? 1 : 0);
-                    select.innerHTML += `<option value="${c.id}">${c.emoji} ${c.cat} (Disponibles: ${qtyToTrade})</option>`;
+                duplicates.forEach(s => {
+                    let totalRepes = state.inventory[s.id] - (state.pasted[s.id] ? 1 : 0);
+                    select.innerHTML += `<option value="${s.id}">${s.char} (Repetidos: ${totalRepes})</option>`;
                 });
             }
         }
 
-        async function generateSecureCode() {
-            let select = document.getElementById('duplicate-select');
-            let cromoId = parseInt(select.value);
-            if (!cromoId) return alert("Selecciona un cromo repetido válido.");
+        async function uploadTradeToServer() {
+            let selector = document.getElementById('select-duplicates');
+            let selectedId = parseInt(selector.value);
+            if(!selectedId) return alert("No hay cromo seleccionado.");
 
             try {
-                let tradeId = "E-" + Math.random().toString(36).substr(2, 9).toUpperCase();
+                let generatedKey = "E-" + Math.random().toString(36).substr(2, 8).toUpperCase();
                 
-                // Enviar al servidor Firebase
-                await dbRef.ref('trades/' + tradeId).set({
-                    cromoId: cromoId,
-                    timestamp: firebase.database.ServerValue.TIMESTAMP
+                await serverDB.ref('trades/' + generatedKey).set({
+                    cromoId: selectedId,
+                    dateCreated: firebase.database.ServerValue.TIMESTAMP
                 });
 
-                // Descontar del inventario local
-                state.inventory[cromoId]--;
-                saveLocal();
-                renderTrade();
+                state.inventory[selectedId]--;
+                saveState();
+                buildTradeView();
 
-                document.getElementById('generated-code').value = tradeId;
-                alert("¡Código subido al servidor! Envíale este código a tu amigo.");
-                
+                document.getElementById('output-server-code').value = generatedKey;
+                alert("¡Subido al servidor! Pásale el código generado a tu amigo.");
             } catch (error) {
-                console.error(error);
-                alert("Error al conectar con el servidor.");
+                alert("Error en el servidor de Firebase.");
             }
         }
 
-        async function redeemSecureCode() {
-            let code = document.getElementById('redeem-code').value.trim().toUpperCase();
-            if(!code) return alert("Escribe el código.");
+        async function redeemTradeFromServer() {
+            let inputField = document.getElementById('input-server-code');
+            let key = inputField.value.trim().toUpperCase();
+            if(!key) return alert("Introduce un código de intercambio.");
 
             try {
-                // Consultar en el servidor si existe el código
-                let snapshot = await dbRef.ref('trades/' + code).once('value');
-                let tradeData = snapshot.val();
+                let snapshot = await serverDB.ref('trades/' + key).once('value');
+                let serverData = snapshot.val();
 
-                if (!tradeData) {
-                    return alert("Código inválido o ya canjeado por otra persona.");
+                if(!serverData) {
+                    return alert("Código erróneo, caducado o ya canjeado por otra persona.");
                 }
 
-                let cromoId = tradeData.cromoId;
-                
-                // 🚨 ANTI-CHEAT: Borrar de inmediato del servidor antes de sumarlo localmente
-                await dbRef.ref('trades/' + code).remove();
+                let targetCromoId = serverData.cromoId;
 
-                // Añadir al inventario local
-                state.inventory[cromoId] = (state.inventory[cromoId] || 0) + 1;
-                saveLocal();
+                // Destrucción inmediata en servidor para evitar trampas (anti-duplicado)
+                await serverDB.ref('trades/' + key).remove();
 
-                let cromoMeta = db.find(c => c.id === cromoId);
-                alert(`¡Canje exitoso! Recibiste: ${cromoMeta.emoji}. El código ha sido destruido del servidor.`);
-                document.getElementById('redeem-code').value = '';
-                
+                state.inventory[targetCromoId] = (state.inventory[targetCromoId] || 0) + 1;
+                saveState();
+
+                let metadata = stickerList.find(s => s.id === targetCromoId);
+                alert(`¡Canje completado! Has recibido el cromo: ${metadata.char}`);
+                inputField.value = '';
+                buildTradeView();
+
             } catch(e) {
-                console.error(e);
-                alert("Error de comunicación en el canje.");
+                alert("Error de conexión al procesar el código.");
             }
         }
 
-        // Ejecución inicial
-        loadLocal();
-        renderAlbum();
+        // Carga Automática inicial al abrir la app
+        loadState();
+        buildAlbumView();
     </script>
 </body>
 </html>
