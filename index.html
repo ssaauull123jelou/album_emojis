@@ -612,38 +612,70 @@
         }
 
         function spinWheel() {
-            document.getElementById('spin-btn').disabled = true;
-            let wheel = document.getElementById('main-wheel');
-            let rand = Math.random() * 100;
-            let cardsCount, deg;
+    document.getElementById('spin-btn').disabled = true;
+    let wheel = document.getElementById('main-wheel');
+    
+    // Generamos un número del 0 al 99.99
+    let rand = Math.random() * 100;
+    let cardsCount, stopDeg;
 
-            if(rand < 50) { cardsCount = 1; deg = 1800 + 90; }
-            else if(rand < 75) { cardsCount = 3; deg = 1800 + 225; }
-            else if(rand < 90) { cardsCount = 5; deg = 1800 + 315; }
-            else { cardsCount = 10; deg = 1800 + 350; }
+    // Función auxiliar para que la ruleta caiga en un ángulo aleatorio dentro de un rango seguro
+    const getRandomDeg = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
 
-            wheel.style.transform = `rotate(${deg}deg)`;
+    /* LÓGICA CORREGIDA:
+       Como la ruleta gira hacia la derecha, el punto que queda debajo del puntero es: (360 - Ángulo).
+       Por tanto, si queremos que caiga en el Azul (0 a 180), el ángulo final debe tener un resto entre 180 y 360.
+    */
+    
+    if(rand < 50) { 
+        // 🟦 Azul (50% prob) - Sector visual: 0° a 180°
+        cardsCount = 1; 
+        stopDeg = getRandomDeg(185, 355); // Margen para no pisar la línea
+    }
+    else if(rand < 75) { 
+        // 🟩 Verde (25% prob) - Sector visual: 180° a 270°
+        cardsCount = 3; 
+        stopDeg = getRandomDeg(95, 175); 
+    }
+    else if(rand < 90) { 
+        // 🟪 Morado (15% prob) - Sector visual: 270° a 324°
+        cardsCount = 5; 
+        stopDeg = getRandomDeg(40, 85); 
+    }
+    else { 
+        // 🟧 Naranja (10% prob) - Sector visual: 324° a 360°
+        cardsCount = 10; 
+        stopDeg = getRandomDeg(5, 30); 
+    }
 
-            setTimeout(() => {
-                state.lastWheelDay = new Date().toDateString();
-                saveState();
-                
-                let zone = document.getElementById('reveal-zone');
-                zone.innerHTML = '';
-                document.getElementById('pack-modal-title').innerText = `¡Premio Ruleta: ${cardsCount} Cartas!`;
+    // Le damos 5 vueltas de inercia (1800 grados) + el grado donde debe frenar
+    let finalDeg = 1800 + stopDeg;
+    wheel.style.transform = `rotate(${finalDeg}deg)`;
 
-                for (let i = 0; i < cardsCount; i++) {
-                    let randomItem = stickerList[Math.floor(Math.random() * stickerList.length)];
-                    state.inventory[randomItem.id] = (state.inventory[randomItem.id] || 0) + 1;
-                    zone.innerHTML += `<div class="card-revealed">${randomItem.char}</div>`;
-                }
-                saveState();
-                document.getElementById('pack-modal').style.display = 'flex';
-                document.getElementById('spin-btn').disabled = false;
-                wheel.style.transform = `rotate(0deg)`;
-                checkWheelView();
-            }, 4100);
+    setTimeout(() => {
+        state.lastWheelDay = new Date().toDateString();
+        saveState();
+        
+        let zone = document.getElementById('reveal-zone');
+        zone.innerHTML = '';
+        document.getElementById('pack-modal-title').innerText = `¡Premio Ruleta: ${cardsCount} Cartas!`;
+
+        for (let i = 0; i < cardsCount; i++) {
+            let randomItem = stickerList[Math.floor(Math.random() * stickerList.length)];
+            state.inventory[randomItem.id] = (state.inventory[randomItem.id] || 0) + 1;
+            zone.innerHTML += `<div class="card-revealed">${randomItem.char}</div>`;
         }
+        saveState();
+        document.getElementById('pack-modal').style.display = 'flex';
+        document.getElementById('spin-btn').disabled = false;
+        
+        // ¡Nota! Hemos eliminado el reinicio a 'rotate(0deg)'. 
+        // Como el usuario solo tira 1 vez al día, es mejor que la ruleta se quede 
+        // donde paró. Si la recargan al día siguiente, empezará desde 0 sola.
+        
+        checkWheelView();
+    }, 4100);
+}
 
         function buildRepesView() {
             let listElement = document.getElementById('repes-display-list');
