@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mi Álbum de Emojis Pastel</title>
+    <title>Mi Álbum de Emojis Pastel Pro</title>
+    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     
@@ -12,7 +13,6 @@
             --pastel-blue: #b3cde3;
             --pastel-blue-dark: #8da0cb;
             --pastel-pink: #fbb4ae;
-            --pastel-pink-dark: #e41a1c;
             --pastel-green: #ccebc5;
             --pastel-yellow: #ffffcc;
             --pastel-purple: #decbe4;
@@ -22,42 +22,46 @@
             --card-bg: #ffffff;
             --radius-lg: 20px;
             --radius-md: 12px;
-            --radius-sm: 8px;
+            --header-h: 75px;
+            --nav-h: 65px;
         }
 
         * {
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
         }
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-app);
-            color: var(--text-main);
+        body, html {
             margin: 0;
             padding: 0;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            overflow-x: hidden;
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg-app);
+            color: var(--text-main);
         }
 
+        /* Layout Fijo Anti-Scroll */
         header {
+            height: var(--header-h);
             background: var(--card-bg);
-            padding: 15px;
-            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
             border-bottom: 2px solid #e2e8f0;
             border-bottom-left-radius: var(--radius-lg);
             border-bottom-right-radius: var(--radius-lg);
             box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-            position: sticky;
-            top: 0;
+            position: relative;
             z-index: 100;
         }
 
         header h1 {
             margin: 0;
-            font-size: 1.4rem;
+            font-size: 1.1rem;
             color: #2d3748;
             font-weight: 700;
         }
@@ -65,97 +69,96 @@
         .stats-badge {
             display: inline-block;
             background: var(--pastel-blue);
-            padding: 6px 16px;
+            padding: 3px 12px;
             border-radius: var(--radius-lg);
-            font-size: 0.85rem;
+            font-size: 0.75rem;
             font-weight: 600;
-            margin-top: 8px;
+            margin-top: 4px;
             color: #2b6cb0;
         }
 
-        /* Contenedores a pantalla completa */
+        .main-content {
+            height: calc(100% - var(--header-h) - var(--nav-h));
+            width: 100%;
+            position: relative;
+        }
+
         .container {
             display: none;
-            flex: 1;
             width: 100%;
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-            padding-bottom: 100px;
+            height: 100%;
+            padding: 10px;
+            flex-direction: column;
         }
 
         .container.active {
-            display: block;
+            display: flex;
         }
 
-        /* Estilo Tarjetas Pastel */
         .card {
             background: var(--card-bg);
             border-radius: var(--radius-lg);
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.02);
+            padding: 12px;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.01);
             border: 1px solid #edf2f7;
         }
 
         .card h2 {
             margin-top: 0;
-            font-size: 1.15rem;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
             color: #2d3748;
-            border-left: 5px solid var(--pastel-blue-dark);
-            padding-left: 10px;
+            border-left: 4px solid var(--pastel-blue-dark);
+            padding-left: 8px;
         }
 
-        /* Controles de Categoría */
+        /* Cuadrícula Adaptativa Ajustada a la Pantalla 3x5 */
         .album-nav {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
+            margin-bottom: 6px;
         }
 
         .btn-nav {
             background: var(--pastel-blue);
             border: none;
-            padding: 10px 18px;
+            padding: 6px 14px;
             border-radius: var(--radius-md);
             cursor: pointer;
             font-weight: 600;
             color: #2b6cb0;
-            transition: background 0.2s;
         }
-
-        .btn-nav:active { background: #cbd5e0; }
 
         .cat-title {
             font-weight: 700;
-            font-size: 1.1rem;
+            font-size: 0.95rem;
             background: white;
-            padding: 8px 16px;
+            padding: 6px 14px;
             border-radius: var(--radius-lg);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
         }
 
         .badge-alert {
-            background: var(--pastel-orange);
-            color: #c05621;
-            padding: 6px 14px;
+            font-size: 0.75rem;
+            padding: 4px 10px;
             border-radius: var(--radius-lg);
-            font-size: 0.85rem;
             text-align: center;
             font-weight: 600;
-            margin-bottom: 15px;
+            margin-bottom: 6px;
         }
 
-        /* Cuadrícula de Cromos */
         .sticker-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
+            grid-template-rows: repeat(5, 1fr);
+            gap: 6px;
+            flex-grow: 1;
+            height: 0;
         }
 
         .slot {
-            aspect-ratio: 3/4;
             background: #f7fafc;
             border: 2px dashed #cbd5e0;
             border-radius: var(--radius-md);
@@ -163,15 +166,13 @@
             align-items: center;
             justify-content: center;
             position: relative;
-            cursor: pointer;
-            transition: all 0.2s;
         }
 
         .slot-number {
             position: absolute;
-            top: 6px;
-            left: 6px;
-            font-size: 0.75rem;
+            top: 4px;
+            left: 4px;
+            font-size: 0.65rem;
             color: #a0aec0;
             font-weight: 700;
         }
@@ -184,84 +185,148 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 2.5rem;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.06);
-            border: 3px solid white;
-            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            font-size: 2.2rem;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.05);
+            border: 2px solid white;
+            animation: popIn 0.3s ease-out;
         }
 
         .slot.can-paste {
             border: 2px solid var(--pastel-green);
             background: #e6fffa;
             animation: pulseGlow 1.5s infinite;
+            cursor: pointer;
         }
 
-        @keyframes popIn {
-            0% { transform: scale(0.6) rotate(-10deg); opacity: 0; }
-            100% { transform: scale(1) rotate(0); opacity: 1; }
+        /* Ruleta Diaria */
+        .wheel-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
         }
 
-        @keyframes pulseGlow {
-            0% { box-shadow: 0 0 0 0 rgba(181, 234, 215, 0.7); }
-            70% { box-shadow: 0 0 0 8px rgba(181, 234, 215, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(181, 234, 215, 0); }
+        .wheel-box {
+            position: relative;
+            width: 220px;
+            height: 220px;
+            margin: 15px 0;
         }
 
-        /* Formulario y Botones */
+        .wheel {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 6px solid white;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: transform 4s cubic-bezier(0.1, 0, 0.2, 1);
+        }
+
+        .wheel-pointer {
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 12px solid transparent;
+            border-right: 12px solid transparent;
+            border-top: 18px solid #e41a1c;
+            z-index: 10;
+        }
+
+        /* Lista de Repetidas Escroleable Localmente */
+        .repes-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .repes-list {
+            flex-grow: 1;
+            overflow-y: auto;
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 10px;
+            border: 1px solid #edf2f7;
+        }
+
+        .repes-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px;
+            border-bottom: 1px solid #f7fafc;
+        }
+
+        /* Área de Ajustes e Intercambio */
+        .scrollable-panel {
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+
         input, select, textarea {
             width: 100%;
-            padding: 12px;
-            margin: 10px 0;
+            padding: 8px;
+            margin: 4px 0 8px 0;
             border: 1px solid #e2e8f0;
             border-radius: var(--radius-md);
             background: #f7fafc;
             color: var(--text-main);
-            font-size: 0.95rem;
+            font-size: 0.85rem;
         }
 
         .btn-main {
             background: var(--pastel-blue);
             color: #2b6cb0;
             border: none;
-            padding: 14px;
+            padding: 10px;
             border-radius: var(--radius-md);
             font-weight: 700;
             width: 100%;
             cursor: pointer;
-            font-size: 1rem;
-            transition: background 0.2s;
-        }
-        .btn-main:active { background: #cbd5e0; }
-
-        /* Área de Sobres */
-        .pack-wrapper {
-            text-align: center;
-            padding: 40px 10px;
+            font-size: 0.9rem;
         }
 
-        .pack-visual {
-            width: 150px;
-            height: 210px;
-            background: linear-gradient(135deg, var(--pastel-purple), var(--pastel-blue));
-            margin: 20px auto;
-            border-radius: var(--radius-lg);
-            border: 5px solid white;
+        /* Barra de Navegación */
+        nav {
+            position: absolute;
+            bottom: 0;
+            height: var(--nav-h);
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
             display: flex;
+            justify-content: space-around;
+            border-top: 1px solid #edf2f7;
+            box-shadow: 0 -4px 16px rgba(0,0,0,0.03);
+            z-index: 1000;
+        }
+
+        nav button {
+            background: none;
+            border: none;
+            font-size: 0.75rem;
+            color: #a0aec0;
+            display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            font-size: 4rem;
             cursor: pointer;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-            transition: transform 0.2s;
+            font-weight: 600;
+            width: 20%;
         }
-        .pack-visual:active { transform: scale(0.92); }
 
-        /* Modal de Apertura */
+        nav button.active { color: #2b6cb0; }
+        nav button span { font-size: 1.2rem; margin-bottom: 2px; opacity: 0.6; }
+        nav button.active span { opacity: 1; }
+
+        /* Modales */
         #pack-modal {
             display: none;
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255, 255, 255, 0.95);
+            background: rgba(255, 255, 255, 0.96);
             z-index: 2000;
             flex-direction: column;
             align-items: center;
@@ -271,143 +336,143 @@
 
         .reveal-container {
             display: flex;
-            gap: 12px;
+            gap: 8px;
             flex-wrap: wrap;
             justify-content: center;
-            margin: 30px 0;
+            margin: 20px 0;
         }
 
         .card-revealed {
-            width: 85px;
-            height: 120px;
+            width: 65px;
+            height: 90px;
             background: white;
             border-radius: var(--radius-md);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 3rem;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.06);
-            border: 3px solid var(--pastel-blue);
-            animation: dropAnim 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+            font-size: 2.2rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            border: 2px solid var(--pastel-blue);
+            animation: dropAnim 0.4s ease-out;
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.7); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 0 0 rgba(181, 234, 215, 0.7); }
+            70% { box-shadow: 0 0 0 6px rgba(181, 234, 215, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(181, 234, 215, 0); }
         }
 
         @keyframes dropAnim {
-            0% { transform: translateY(-50px) scale(0.5); opacity: 0; }
-            100% { transform: translateY(0) scale(1); opacity: 1; }
-        }
-
-        /* Barra navegación inferior de App */
-        nav {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            background: rgba(255, 255, 255, 0.92);
-            backdrop-filter: blur(10px);
-            display: flex;
-            justify-content: space-around;
-            padding: 10px 0 cubic-bezier(0.075, 0.82, 0.165, 1);
-            border-top: 1px solid #edf2f7;
-            border-top-left-radius: var(--radius-lg);
-            border-top-right-radius: var(--radius-lg);
-            box-shadow: 0 -4px 16px rgba(0,0,0,0.04);
-            z-index: 1000;
-        }
-
-        nav button {
-            background: none;
-            border: none;
-            font-size: 0.8rem;
-            color: #a0aec0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            cursor: pointer;
-            font-weight: 600;
-            width: 33%;
-        }
-
-        nav button.active {
-            color: #2b6cb0;
-        }
-
-        nav button span {
-            font-size: 1.4rem;
-            margin-bottom: 4px;
-            opacity: 0.6;
-        }
-
-        nav button.active span {
-            opacity: 1;
+            0% { transform: translateY(-30px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
         }
     </style>
 </head>
 <body>
 
     <header>
-        <h1>🏆 Mi Álbum de Emojis</h1>
+        <h1>🏆 Mi Álbum de Emojis Pastel</h1>
         <div class="stats-badge" id="global-stats">Progreso: 0/225</div>
     </header>
 
-    <div id="tab-album" class="container active">
-        <div class="album-nav">
-            <button class="btn-nav" onclick="changeCategory(-1)">◀</button>
-            <span class="cat-title" id="display-cat">Cargando...</span>
-            <button class="btn-nav" onclick="changeCategory(1)">▶</button>
-        </div>
-        <div class="badge-alert" id="alert-category">No tienes cromos nuevos aquí.</div>
-        <div class="sticker-grid" id="album-grid"></div>
-    </div>
-
-    <div id="tab-packs" class="container">
-        <div class="card pack-wrapper">
-            <h2 style="border:none; text-align:center; padding:0;" id="pack-headline">Buscando sobres...</h2>
-            <div class="pack-visual" id="pack-element" onclick="openPack()">📦</div>
-            <p style="color:#718096; font-size:0.9rem;">Los sobres se recargan automáticamente cada día de forma gratuita.</p>
-        </div>
-    </div>
-
-    <div id="tab-trade" class="container">
-        <div class="card" style="background: #edf4f9;">
-            <h2>💾 Guardado Local (Anti-Caché)</h2>
-            <p style="font-size:0.85rem; color:#4a5568;">Genera un código de texto para guardar tus datos fuera del navegador por si borras el historial.</p>
-            
-            <button class="btn-main" style="background: var(--pastel-purple); color:#6b46c1;" onclick="exportBackupCode()">Generar Código de Guardado</button>
-            <textarea id="output-backup-box" rows="2" readonly placeholder="Tu código de seguridad saldrá aquí..." onclick="this.select()"></textarea>
-            
-            <hr style="border:0; border-top:1px solid #cbd5e0; margin:15px 0;">
-            
-            <input type="text" id="input-backup-box" placeholder="Pega aquí tu código guardado...">
-            <button class="btn-main" style="background: var(--pastel-green); color:#22543d;" onclick="importBackupCode()">Cargar Código Guardado</button>
+    <div class="main-content">
+        <!-- PESTAÑA 1: ÁLBUM -->
+        <div id="tab-album" class="container active">
+            <div class="album-nav">
+                <button class="btn-nav" onclick="changeCategory(-1)">◀</button>
+                <span class="cat-title" id="display-cat">Cargando...</span>
+                <button class="btn-nav" onclick="changeCategory(1)">▶</button>
+            </div>
+            <div class="badge-alert" id="alert-category">Comprobando...</div>
+            <div class="sticker-grid" id="album-grid"></div>
         </div>
 
-        <div class="card">
-            <h2>📤 Dar Cromo (Generar Código)</h2>
-            <select id="select-duplicates"></select>
-            <button class="btn-main" onclick="uploadTradeToServer()">Subir y Crear Código Seguro</button>
-            <textarea id="output-server-code" rows="2" readonly placeholder="Código seguro de un solo uso..."></textarea>
+        <!-- PESTAÑA 2: RULETA DIARIA -->
+        <div id="tab-wheel" class="container">
+            <div class="wheel-container" id="wheel-active-view">
+                <h3 style="margin: 0 0 5px 0; font-size: 1rem; text-align: center;">🎡 ¡Ruleta de la Suerte Diaria!</h3>
+                <p style="margin: 0; font-size: 0.8rem; color:#718096; text-align: center;">Gira para conseguir sobres sorpresa</p>
+                <div class="wheel-box">
+                    <div class="wheel-pointer"></div>
+                    <div class="wheel" id="main-wheel" style="background: conic-gradient(var(--pastel-blue) 0% 50%, var(--pastel-green) 50% 75%, var(--pastel-purple) 75% 90%, var(--pastel-orange) 90% 100%);"></div>
+                </div>
+                <button class="btn-main" id="spin-btn" style="max-width: 200px;" onclick="spinWheel()">¡GIRAR!</button>
+            </div>
+            <div id="wheel-claimed-view" style="display:none; text-align:center; margin-top:40px; padding: 20px;">
+                <h2>✨ Vuelve Mañana ✨</h2>
+                <p style="color:#718096; font-size: 0.9rem;">Ya consumiste tu tirada diaria de hoy. ¡Te esperamos mañana!</p>
+            </div>
         </div>
 
-        <div class="card">
-            <h2>📥 Recibir Cromo (Canjear Código)</h2>
-            <input type="text" id="input-server-code" placeholder="Pega el código 'E-...' de tu amigo">
-            <button class="btn-main" style="background: var(--pastel-pink); color:#742a2a;" onclick="redeemTradeFromServer()">Validar en Servidor</button>
+        <!-- PESTAÑA 3: MIS REPETIDAS -->
+        <div id="tab-repes" class="container">
+            <div class="repes-container">
+                <h3 style="margin: 0 0 8px 0; font-size: 1rem; display: flex; justify-content: space-between;">
+                    <span>💎 Mis Repetidas</span>
+                    <span id="repes-total-counter" style="font-size: 0.8rem; background: #e2e8f0; padding: 2px 8px; border-radius: 10px;">Total: 0</span>
+                </h3>
+                <div class="repes-list" id="repes-display-list"></div>
+            </div>
+        </div>
+
+        <!-- PESTAÑA 4: SOBRES DIARIOS -->
+        <div id="tab-packs" class="container">
+            <div class="card" style="text-align: center; padding: 25px 10px; margin: auto 0;">
+                <h2 style="border:none; text-align:center; padding:0; font-size: 1.1rem;" id="pack-headline">Buscando sobres...</h2>
+                <div id="pack-element" style="font-size: 4rem; margin: 15px 0; cursor: pointer; transition: transform 0.1s;" onclick="openPack()">📦</div>
+                <p style="color:#718096; font-size:0.8rem; margin: 0;">Los sobres de la tienda se restauran cada 24 horas.</p>
+            </div>
+        </div>
+
+        <!-- PESTAÑA 5: AJUSTES ONLINE -->
+        <div id="tab-trade" class="container">
+            <div class="scrollable-panel">
+                <div class="card" style="background: #edf4f9;">
+                    <h2>💾 Copia de Seguridad Local</h2>
+                    <button class="btn-main" style="background: var(--pastel-purple); color:#6b46c1; padding: 6px;" onclick="exportBackupCode()">Exportar Datos</button>
+                    <textarea id="output-backup-box" rows="1" readonly placeholder="Tu código..." onclick="this.select()"></textarea>
+                    <input type="text" id="input-backup-box" placeholder="Pega código de resguardo aquí...">
+                    <button class="btn-main" style="background: var(--pastel-green); color:#22543d; padding: 6px;" onclick="importBackupCode()">Importar Datos</button>
+                </div>
+
+                <div class="card">
+                    <h2>📤 Generar Código Intercambio</h2>
+                    <select id="select-duplicates"></select>
+                    <button class="btn-main" style="padding: 6px;" onclick="uploadTradeToServer()">Subir Cromo Seguro</button>
+                    <textarea id="output-server-code" rows="1" readonly placeholder="Código de un solo uso..."></textarea>
+                </div>
+
+                <div class="card">
+                    <h2>📥 Canjear Código Intercambio</h2>
+                    <input type="text" id="input-server-code" placeholder="Pega el código 'E-...' de tu amigo">
+                    <button class="btn-main" style="background: var(--pastel-pink); color:#742a2a; padding: 6px;" onclick="redeemTradeFromServer()">Validar y Reclamar</button>
+                </div>
+            </div>
         </div>
     </div>
 
     <nav>
         <button id="nav-album" class="active" onclick="navigateTo('album')"><span>📖</span>Álbum</button>
+        <button id="nav-wheel" onclick="navigateTo('wheel')"><span>🎡</span>Ruleta</button>
+        <button id="nav-repes" onclick="navigateTo('repes')"><span>💎</span>Repes</button>
         <button id="nav-packs" onclick="navigateTo('packs')"><span>📦</span>Sobres</button>
-        <button id="nav-trade" onclick="navigateTo('trade')"><span>⚙️</span>Ajustes</button>
+        <button id="nav-trade" onclick="navigateTo('trade')"><span>⚙️</span>Red</button>
     </nav>
 
+    <!-- MODAL DE REVELACIÓN -->
     <div id="pack-modal">
-        <h2 style="color:#2d3748; font-weight:800; margin:0;">¡Sobre Abierto!</h2>
+        <h2 id="pack-modal-title" style="color:#2d3748; font-weight:800; margin:0; font-size:1.2rem;">¡Sobre Abierto!</h2>
         <div class="reveal-container" id="reveal-zone"></div>
-        <button class="btn-main" style="max-width:250px;" onclick="closePackModal()">Guardar en el álbum</button>
+        <button class="btn-main" style="max-width:220px;" onclick="closePackModal()">Guardar todo</button>
     </div>
 
     <script>
-        // --- CONFIGURACIÓN DE TU BASE DE DATOS DE LA CAPTURA ---
+        // --- CONFIGURACIÓN DE FIREBASE REALTIME DATABASE ---
         const firebaseConfig = {
             apiKey: "AIzaSyAxqCOJmNhaa0DCTgweiQE3sbYHC7qkc0",
             authDomain: "album-emojis.firebaseapp.com",
@@ -421,7 +486,6 @@
         firebase.initializeApp(firebaseConfig);
         const serverDB = firebase.database();
 
-        // Estructura interna de cromos (225 en total)
         const categoriesData = {
             "Caras": "😀,😂,🥰,😎,😭,😡,🤔,😴,🥳,🤯,🥶,😱,🤫,🤓,🤠",
             "Animales": "🐶,🐱,🐭,🐹,🐰,🦊,🐻,🐼,🐨,🐯,🦁,🐮,🐷,🐸,🐵",
@@ -451,12 +515,15 @@
             });
         }
 
-        // Estado del usuario
-        let state = { inventory: {}, pasted: {}, lastOpenedDay: '', packsCount: 2 };
+        // Estado inicial vacío (0% progreso)
+        let state = { inventory: {}, pasted: {}, lastOpenedDay: '', packsCount: 2, lastWheelDay: '' };
 
         function loadState() {
             let local = localStorage.getItem('emoji_album_pastel_save');
-            if (local) state = JSON.parse(local);
+            if (local) {
+                state = JSON.parse(local);
+            }
+            
             let today = new Date().toDateString();
             if (state.lastOpenedDay !== today) {
                 state.lastOpenedDay = today;
@@ -476,7 +543,6 @@
             document.getElementById('global-stats').innerText = `Progreso: ${totalPasted}/225`;
         }
 
-        // Navegación entre pestañas fijas superiores
         function navigateTo(tabName) {
             document.querySelectorAll('.container').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('nav button').forEach(el => el.classList.remove('active'));
@@ -485,18 +551,17 @@
             document.getElementById('nav-' + tabName).classList.add('active');
 
             if(tabName === 'album') buildAlbumView();
+            if(tabName === 'wheel') checkWheelView();
+            if(tabName === 'repes') buildRepesView();
             if(tabName === 'packs') buildPacksView();
             if(tabName === 'trade') buildTradeView();
         }
 
         function changeCategory(direction) {
-            activeCatIndex += direction;
-            if(activeCatIndex < 0) activeCatIndex = categoryNames.length - 1;
-            if(activeCatIndex >= categoryNames.length) activeCatIndex = 0;
+            activeCatIndex = (activeCatIndex + direction + categoryNames.length) % categoryNames.length;
             buildAlbumView();
         }
 
-        // Renderizado Dinámico del Álbum
         function buildAlbumView() {
             let currentCat = categoryNames[activeCatIndex];
             document.getElementById('display-cat').innerText = currentCat;
@@ -522,7 +587,7 @@
 
                 if (isPasted) {
                     return `<div class="slot"><div class="sticker">${s.char}</div></div>`;
-                } else if (!isPasted && hasInInventory > 0) {
+                } else if (hasInInventory > 0) {
                     return `<div class="slot can-paste" onclick="pasteAction(${s.id})">
                                 <span class="slot-number">${s.id}</span>
                                 <span style="font-size:1.8rem; opacity:0.25;">${s.char}</span>
@@ -539,7 +604,73 @@
             buildAlbumView();
         }
 
-        // Sistema de sobres
+        function checkWheelView() {
+            let today = new Date().toDateString();
+            let claimed = state.lastWheelDay === today;
+            document.getElementById('wheel-active-view').style.display = claimed ? 'none' : 'flex';
+            document.getElementById('wheel-claimed-view').style.display = claimed ? 'block' : 'none';
+        }
+
+        function spinWheel() {
+            document.getElementById('spin-btn').disabled = true;
+            let wheel = document.getElementById('main-wheel');
+            let rand = Math.random() * 100;
+            let cardsCount, deg;
+
+            if(rand < 50) { cardsCount = 1; deg = 1800 + 90; }
+            else if(rand < 75) { cardsCount = 3; deg = 1800 + 225; }
+            else if(rand < 90) { cardsCount = 5; deg = 1800 + 315; }
+            else { cardsCount = 10; deg = 1800 + 350; }
+
+            wheel.style.transform = `rotate(${deg}deg)`;
+
+            setTimeout(() => {
+                state.lastWheelDay = new Date().toDateString();
+                saveState();
+                
+                let zone = document.getElementById('reveal-zone');
+                zone.innerHTML = '';
+                document.getElementById('pack-modal-title').innerText = `¡Premio Ruleta: ${cardsCount} Cartas!`;
+
+                for (let i = 0; i < cardsCount; i++) {
+                    let randomItem = stickerList[Math.floor(Math.random() * stickerList.length)];
+                    state.inventory[randomItem.id] = (state.inventory[randomItem.id] || 0) + 1;
+                    zone.innerHTML += `<div class="card-revealed">${randomItem.char}</div>`;
+                }
+                saveState();
+                document.getElementById('pack-modal').style.display = 'flex';
+                document.getElementById('spin-btn').disabled = false;
+                wheel.style.transform = `rotate(0deg)`;
+                checkWheelView();
+            }, 4100);
+        }
+
+        function buildRepesView() {
+            let listElement = document.getElementById('repes-display-list');
+            listElement.innerHTML = '';
+            let totalRepes = 0;
+
+            stickerList.forEach(s => {
+                let count = state.inventory[s.id] || 0;
+                let isPasted = state.pasted[s.id];
+                let repes = isPasted ? count - 1 : count;
+
+                if(repes > 0) {
+                    totalRepes += repes;
+                    listElement.innerHTML += `
+                        <div class="repes-item">
+                            <span>${s.char} <small style="color:#a0aec0; margin-left: 5px;">(${s.category})</small></span>
+                            <b style="color:#2b6cb0; background:#ebf8ff; padding:2px 8px; border-radius:6px; font-size:0.85rem;">x${repes}</b>
+                        </div>`;
+                }
+            });
+
+            document.getElementById('repes-total-counter').innerText = `Total: ${totalRepes}`;
+            if(totalRepes === 0) {
+                listElement.innerHTML = '<p style="text-align:center; opacity:0.4; margin-top:30px; font-size:0.9rem;">No posees cromos repetidos aún.</p>';
+            }
+        }
+
         function buildPacksView() {
             let headline = document.getElementById('pack-headline');
             let element = document.getElementById('pack-element');
@@ -560,6 +691,7 @@
 
             let zone = document.getElementById('reveal-zone');
             zone.innerHTML = '';
+            document.getElementById('pack-modal-title').innerText = "¡Sobre Abierto! (5 Cartas)";
 
             for (let i = 0; i < 5; i++) {
                 let randomItem = stickerList[Math.floor(Math.random() * stickerList.length)];
@@ -567,7 +699,7 @@
                 
                 setTimeout(() => {
                     zone.innerHTML += `<div class="card-revealed">${randomItem.char}</div>`;
-                }, i * 200);
+                }, i * 150);
             }
             saveState();
             document.getElementById('pack-modal').style.display = 'flex';
@@ -578,60 +710,48 @@
             navigateTo('album');
         }
 
-        // =========================================================
-        // ⭐ SISTEMA NUEVO: COPIA DE SEGURIDAD LOCAL (SIN FIREBASE) ⭐
-        // =========================================================
         function exportBackupCode() {
             try {
-                // Convertimos el objeto completo a texto comprimido en Base64
                 let dataString = JSON.stringify(state);
                 let encoded = btoa(unescape(encodeURIComponent(dataString)));
-                
                 document.getElementById('output-backup-box').value = encoded;
-                alert("¡Código de seguridad generado! Copia el texto y guárdalo en tus notas. Te servirá si borras la caché.");
+                alert("¡Código de respaldo local copiado!");
             } catch (err) {
-                alert("Error al empaquetar tus datos.");
+                alert("Error al procesar el guardado.");
             }
         }
 
         function importBackupCode() {
             let inputField = document.getElementById('input-backup-box');
             let rawCode = inputField.value.trim();
-            if (!rawCode) return alert("Por favor, pega primero el código de respaldo.");
+            if (!rawCode) return alert("Pega un código de respaldo.");
 
             try {
                 let decodedString = decodeURIComponent(escape(atob(rawCode)));
                 let parsedState = JSON.parse(decodedString);
-
                 if (parsedState.inventory && parsedState.pasted) {
                     state = parsedState;
                     saveState();
                     buildAlbumView();
                     inputField.value = '';
-                    alert("¡Álbum restaurado con éxito! Tus cromos se han cargado correctamente.");
-                } else {
-                    alert("El código ingresado no contiene una copia válida.");
+                    alert("¡Álbum cargado con éxito!");
                 }
             } catch(e) {
-                alert("Código inválido. Asegúrate de haberlo copiado de forma completa y exacta.");
+                alert("Código dañado o inválido.");
             }
         }
 
-        // =========================================================
-        // INTERCAMBIOS ONLINE MEDIANTE TU SERVIDOR FIREBASE
-        // =========================================================
         function buildTradeView() {
             let select = document.getElementById('select-duplicates');
             select.innerHTML = '';
-            
             let duplicates = stickerList.filter(s => (state.inventory[s.id] || 0) > (state.pasted[s.id] ? 1 : 0));
 
             if(duplicates.length === 0) {
-                select.innerHTML = '<option value="">No tienes cromos repetidos</option>';
+                select.innerHTML = '<option value="">Sin cromos utilizables</option>';
             } else {
                 duplicates.forEach(s => {
                     let totalRepes = state.inventory[s.id] - (state.pasted[s.id] ? 1 : 0);
-                    select.innerHTML += `<option value="${s.id}">${s.char} (Repetidos: ${totalRepes})</option>`;
+                    select.innerHTML += `<option value="${s.id}">${s.char} (Disponibles: ${totalRepes})</option>`;
                 });
             }
         }
@@ -639,11 +759,10 @@
         async function uploadTradeToServer() {
             let selector = document.getElementById('select-duplicates');
             let selectedId = parseInt(selector.value);
-            if(!selectedId) return alert("No hay cromo seleccionado.");
+            if(!selectedId) return alert("Selecciona un cromo válido.");
 
             try {
                 let generatedKey = "E-" + Math.random().toString(36).substr(2, 8).toUpperCase();
-                
                 await serverDB.ref('trades/' + generatedKey).set({
                     cromoId: selectedId,
                     dateCreated: firebase.database.ServerValue.TIMESTAMP
@@ -654,44 +773,38 @@
                 buildTradeView();
 
                 document.getElementById('output-server-code').value = generatedKey;
-                alert("¡Subido al servidor! Pásale el código generado a tu amigo.");
+                alert("¡Subido! Comparte el código con tu amigo.");
             } catch (error) {
-                alert("Error en el servidor de Firebase.");
+                alert("Fallo al conectar con Firebase.");
             }
         }
 
         async function redeemTradeFromServer() {
             let inputField = document.getElementById('input-server-code');
             let key = inputField.value.trim().toUpperCase();
-            if(!key) return alert("Introduce un código de intercambio.");
+            if(!key) return alert("Introduce un código.");
 
             try {
                 let snapshot = await serverDB.ref('trades/' + key).once('value');
                 let serverData = snapshot.val();
-
-                if(!serverData) {
-                    return alert("Código erróneo, caducado o ya canjeado por otra persona.");
-                }
+                if(!serverData) return alert("Código inválido o ya usado.");
 
                 let targetCromoId = serverData.cromoId;
-
-                // Destrucción inmediata en servidor para evitar trampas (anti-duplicado)
                 await serverDB.ref('trades/' + key).remove();
 
                 state.inventory[targetCromoId] = (state.inventory[targetCromoId] || 0) + 1;
                 saveState();
 
                 let metadata = stickerList.find(s => s.id === targetCromoId);
-                alert(`¡Canje completado! Has recibido el cromo: ${metadata.char}`);
+                alert(`¡Intercambio realizado! Recibiste: ${metadata.char}`);
                 inputField.value = '';
                 buildTradeView();
-
             } catch(e) {
-                alert("Error de conexión al procesar el código.");
+                alert("Error al procesar el código de red.");
             }
         }
 
-        // Carga Automática inicial al abrir la app
+        // Lanzamiento automático
         loadState();
         buildAlbumView();
     </script>
