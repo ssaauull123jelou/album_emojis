@@ -66,6 +66,12 @@
             font-weight: 700;
         }
 
+        .stats-container {
+            display: flex;
+            gap: 6px;
+            margin-top: 4px;
+        }
+
         .stats-badge {
             display: inline-block;
             background: var(--pastel-blue);
@@ -73,7 +79,6 @@
             border-radius: var(--radius-lg);
             font-size: 0.75rem;
             font-weight: 600;
-            margin-top: 4px;
             color: #2b6cb0;
         }
 
@@ -113,7 +118,7 @@
             padding-left: 8px;
         }
 
-        /* Cuadrícula Adaptativa Ajustada a la Pantalla 3x5 */
+        /* Cuadrícula Adaptativa 3x5 */
         .album-nav {
             display: flex;
             justify-content: space-between;
@@ -236,7 +241,7 @@
             z-index: 10;
         }
 
-        /* Lista de Repetidas Escroleable Localmente */
+        /* Gestión de Repetidas */
         .repes-container {
             display: flex;
             flex-direction: column;
@@ -244,12 +249,11 @@
         }
 
         .repes-list {
-            flex-grow: 1;
-            overflow-y: auto;
             background: white;
             border-radius: var(--radius-lg);
-            padding: 10px;
+            padding: 8px;
             border: 1px solid #edf2f7;
+            overflow-y: auto;
         }
 
         .repes-item {
@@ -260,7 +264,7 @@
             border-bottom: 1px solid #f7fafc;
         }
 
-        /* Área de Ajustes e Intercambio */
+        /* Paneles Escroleables */
         .scrollable-panel {
             overflow-y: auto;
             flex-grow: 1;
@@ -289,7 +293,7 @@
             font-size: 0.9rem;
         }
 
-        /* Barra de Navegación */
+        /* Barra de Navegación Fija */
         nav {
             position: absolute;
             bottom: 0;
@@ -356,6 +360,19 @@
             animation: dropAnim 0.4s ease-out;
         }
 
+        .timer-badge {
+            color: #e53e3e;
+            font-size: 0.85rem;
+            font-weight: bold;
+            margin: 5px 0;
+        }
+
+        .grid-store-2col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
         @keyframes popIn {
             0% { transform: scale(0.7); opacity: 0; }
             100% { transform: scale(1); opacity: 1; }
@@ -377,7 +394,10 @@
 
     <header>
         <h1>🏆 Mi Álbum de Emojis Pastel</h1>
-        <div class="stats-badge" id="global-stats">Progreso: 0/225</div>
+        <div class="stats-container">
+            <div class="stats-badge" id="global-stats">Progreso: 0/235</div>
+            <div class="stats-badge" id="gems-stats" style="background: #e9d8fd; color: #6b46c1;">💎 0 Gemas</div>
+        </div>
     </header>
 
     <div class="main-content">
@@ -396,7 +416,7 @@
         <div id="tab-wheel" class="container">
             <div class="wheel-container" id="wheel-active-view">
                 <h3 style="margin: 0 0 5px 0; font-size: 1rem; text-align: center;">🎡 ¡Ruleta de la Suerte Diaria!</h3>
-                <p style="margin: 0; font-size: 0.8rem; color:#718096; text-align: center;">Gira para conseguir sobres sorpresa</p>
+                <p style="margin: 0; font-size: 0.8rem; color:#718096; text-align: center;">Gira para conseguir gemas o sobres sorpresa</p>
                 <div class="wheel-box">
                     <div class="wheel-pointer"></div>
                     <div class="wheel" id="main-wheel" style="background: conic-gradient(var(--pastel-blue) 0% 50%, var(--pastel-green) 50% 75%, var(--pastel-purple) 75% 90%, var(--pastel-orange) 90% 100%);"></div>
@@ -405,27 +425,79 @@
             </div>
             <div id="wheel-claimed-view" style="display:none; text-align:center; margin-top:40px; padding: 20px;">
                 <h2>✨ Vuelve Mañana ✨</h2>
-                <p style="color:#718096; font-size: 0.9rem;">Ya consumiste tu tirada diaria de hoy. ¡Te esperamos mañana!</p>
+                <p style="color:#718096; font-size: 0.9rem;">Ya consumiste tu tirada diaria de hoy.</p>
+                <div class="timer-badge" id="wheel-countdown-text"></div>
             </div>
         </div>
 
-        <!-- PESTAÑA 3: MIS REPETIDAS -->
+        <!-- PESTAÑA 3: GESTIÓN DE CROMOS -->
         <div id="tab-repes" class="container">
             <div class="repes-container">
                 <h3 style="margin: 0 0 8px 0; font-size: 1rem; display: flex; justify-content: space-between;">
-                    <span>💎 Mis Repetidas</span>
-                    <span id="repes-total-counter" style="font-size: 0.8rem; background: #e2e8f0; padding: 2px 8px; border-radius: 10px;">Total: 0</span>
+                    <span>📋 Tus Cromos</span>
+                    <span id="repes-total-counter" style="font-size: 0.8rem; background: #e2e8f0; padding: 2px 8px; border-radius: 10px;">Repes: 0</span>
                 </h3>
-                <div class="repes-list" id="repes-display-list"></div>
+                
+                <div class="card" style="margin-bottom: 8px;">
+                    <h2 style="font-size: 0.85rem; color: #2b6cb0; margin-bottom: 4px;">📌 Guardados (Sin Pegar en Álbum)</h2>
+                    <div class="repes-list" id="sin-pegar-display-list" style="max-height: 160px;"></div>
+                </div>
+
+                <div class="card">
+                    <h2 style="font-size: 0.85rem; color: #b7791f; margin-bottom: 4px;">💎 Repetidos Duplicados (Sobrantes)</h2>
+                    <div class="repes-list" id="repes-display-list" style="max-height: 160px;"></div>
+                </div>
             </div>
         </div>
 
-        <!-- PESTAÑA 4: SOBRES DIARIOS -->
-        <div id="tab-packs" class="container">
-            <div class="card" style="text-align: center; padding: 25px 10px; margin: auto 0;">
-                <h2 style="border:none; text-align:center; padding:0; font-size: 1.1rem;" id="pack-headline">Buscando sobres...</h2>
-                <div id="pack-element" style="font-size: 4rem; margin: 15px 0; cursor: pointer; transition: transform 0.1s;" onclick="openPack()">📦</div>
-                <p style="color:#718096; font-size:0.8rem; margin: 0;">Los sobres de la tienda se restauran cada 24 horas.</p>
+        <!-- PESTAÑA 4: TIENDA COMPLETA -->
+        <div id="tab-packs" class="container" style="overflow-y: auto;">
+            <div class="scrollable-panel">
+                
+                <!-- SECCIÓN 1: SOBRES DIARIOS GRATUITOS -->
+                <div class="card" style="text-align: center; padding: 12px 10px; margin-bottom: 12px;">
+                    <h2 style="border:none; text-align:center; padding:0; font-size: 1rem;" id="pack-headline">Buscando sobres...</h2>
+                    <div id="pack-element" style="font-size: 3.5rem; margin: 6px 0; cursor: pointer; display:inline-block;" onclick="openPack()">📦</div>
+                    <div class="timer-badge" id="daily-packs-countdown-text" style="margin:0;"></div>
+                    <p style="color:#718096; font-size:0.75rem; margin: 4px 0 0 0;">¡Cada sobre abierto te otorga +1 💎 gema de bonus!</p>
+                </div>
+
+                <!-- SECCIÓN 2: OFERTAS ESPECIALES LIMITADAS (ROTACIÓN 3 DÍAS) -->
+                <div class="card" style="background: linear-gradient(135deg, #fff5f5 0%, #fed7d7 100%); border: 2px solid #f56565; padding: 12px 10px; margin-bottom: 12px;">
+                    <h2 style="border:none; text-align:center; padding:0; font-size: 1rem; color: #c53030; font-weight: 800; margin-bottom: 2px;">🔥 Ofertas Especiales Limitadas 🔥</h2>
+                    <div class="timer-badge" id="offers-countdown-text" style="text-align:center; margin-bottom: 8px; color: #c53030;"></div>
+                    <div id="brawl-offers-container" style="display: flex; flex-direction: column; gap: 8px;"></div>
+                </div>
+
+                <!-- SECCIÓN 3: TIENDA PERMANENTE DE SOBRES (COMPRA CON GEMAS) -->
+                <div class="card" style="margin-bottom: 12px;">
+                    <h2>🛒 Compra de Sobres Permanente</h2>
+                    <p style="color:#718096; font-size:0.75rem; margin: -4px 0 8px 0;">Disponibles siempre que tengas gemas suficientes.</p>
+                    <div class="grid-store-2col">
+                        <div style="background: #f7fafc; border: 1px solid #e2e8f0; border-radius: var(--radius-md); padding: 10px; text-align: center;">
+                            <div style="font-size: 1.8rem;">✉️</div>
+                            <div style="font-weight: bold; font-size: 0.8rem; margin: 2px 0;">Sobre Básico</div>
+                            <div style="font-size: 0.7rem; color: #718096; margin-bottom: 6px;">3 Cromos Aleatorios</div>
+                            <button class="btn-main" style="padding: 4px; font-size: 0.8rem; background: var(--pastel-purple);" onclick="buyStandardPack(3, 2)">💎 2 Gemas</button>
+                        </div>
+                        <div style="background: #f7fafc; border: 1px solid #e2e8f0; border-radius: var(--radius-md); padding: 10px; text-align: center;">
+                            <div style="font-size: 1.8rem;">🎁</div>
+                            <div style="font-weight: bold; font-size: 0.8rem; margin: 2px 0;">Sobre Premium</div>
+                            <div style="font-size: 0.7rem; color: #718096; margin-bottom: 6px;">6 Cromos Aleatorios</div>
+                            <button class="btn-main" style="padding: 4px; font-size: 0.8rem; background: var(--pastel-purple);" onclick="buyStandardPack(6, 4)">💎 4 Gemas</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECCIÓN 4: BANCO DE INTERCAMBIO (REPETIDOS POR GEMAS) -->
+                <div class="card" style="background: #f0fff4; border: 1px solid #c6f6d5; text-align: center; padding: 10px;">
+                    <h2 style="border:none; text-align:center; padding:0; font-size: 0.95rem; color: #22543d;">♻️ Casa de Empeño de Cromos</h2>
+                    <p style="color:#48bb78; font-size:0.75rem; margin: 2px 0 6px 0; font-weight: 600;">¿Te faltan gemas? ¡Recicla tus repetidos!</p>
+                    <button class="btn-main" style="background: var(--pastel-green); color: #22543d;" onclick="recycleDuplicatesForGems()">
+                        Vender 5 Repetidos ➔ Ganar 💎 2 Gemas
+                    </button>
+                </div>
+
             </div>
         </div>
 
@@ -433,10 +505,10 @@
         <div id="tab-trade" class="container">
             <div class="scrollable-panel">
                 <div class="card" style="background: #edf4f9;">
-                    <h2>💾 Copia de Seguridad Local</h2>
+                    <h2>💾 Copia de Seguridad Local / Canjear Códigos</h2>
                     <button class="btn-main" style="background: var(--pastel-purple); color:#6b46c1; padding: 6px;" onclick="exportBackupCode()">Exportar Datos</button>
                     <textarea id="output-backup-box" rows="1" readonly placeholder="Tu código..." onclick="this.select()"></textarea>
-                    <input type="text" id="input-backup-box" placeholder="Pega código de resguardo aquí...">
+                    <input type="text" id="input-backup-box" placeholder="Pega código de resguardo o CÓDIGO MAESTRO aquí...">
                     <button class="btn-main" style="background: var(--pastel-green); color:#22543d; padding: 6px;" onclick="importBackupCode()">Importar Datos</button>
                 </div>
 
@@ -459,8 +531,8 @@
     <nav>
         <button id="nav-album" class="active" onclick="navigateTo('album')"><span>📖</span>Álbum</button>
         <button id="nav-wheel" onclick="navigateTo('wheel')"><span>🎡</span>Ruleta</button>
-        <button id="nav-repes" onclick="navigateTo('repes')"><span>💎</span>Repes</button>
-        <button id="nav-packs" onclick="navigateTo('packs')"><span>📦</span>Sobres</button>
+        <button id="nav-repes" onclick="navigateTo('repes')"><span>📋</span>Cromos</button>
+        <button id="nav-packs" onclick="navigateTo('packs')"><span>🏪</span>Tienda</button>
         <button id="nav-trade" onclick="navigateTo('trade')"><span>⚙️</span>Red</button>
     </nav>
 
@@ -501,7 +573,8 @@
             "Herramientas": "🔨,🪓,⛏️,⚒️,🛠️,🗡️,⚔️,🔫,🏹,🛡️,🔧,🪛,🔩,🗜️,⚙️",
             "Monstruos": "👽,👾,🤖,🎃,👹,👺,👻,💀,☠️,🧟,🧛,🧜,🧚,🧞,🧝",
             "Símbolos": "🛑,⛔,☢️,☣️,⬆️,⬇️,➡️,⬅️,❓,❕,♻️,🔱,💯,💢,💬",
-            "Espacio": "🌍,🌕,🌖,🌗,🌘,🌑,🌒,🌓,🌔,🌙,🪐,💫,⭐,🌟,✨"
+            "Espacio": "🌍,🌕,🌖,🌗,🌘,🌑,🌒,🌓,🌔,🌙,🪐,💫,⭐,🌟,✨",
+            "Exclusivos": "👑,🔮,🦄,🦚,🐲,🪐,🌌,🏆,🥇,💎"
         };
 
         const stickerList = [];
@@ -515,8 +588,20 @@
             });
         }
 
-        // Estado inicial vacío (0% progreso)
-        let state = { inventory: {}, pasted: {}, lastOpenedDay: '', packsCount: 2, lastWheelDay: '' };
+        const normalStickers = stickerList.filter(s => s.category !== "Exclusivos");
+        const exclusiveStickers = stickerList.filter(s => s.category === "Exclusivos");
+
+        let state = { 
+            inventory: {}, 
+            pasted: {}, 
+            lastOpenedDay: '', 
+            packsCount: 3, 
+            lastWheelDay: '',
+            gems: 0,
+            lastOffersTime: 0,
+            activeOffers: [],
+            claimedOffers: [false, false, false, false]
+        };
 
         function loadState() {
             let local = localStorage.getItem('emoji_album_pastel_save');
@@ -524,10 +609,15 @@
                 state = JSON.parse(local);
             }
             
+            if (state.gems === undefined) state.gems = 0;
+            if (state.lastOffersTime === undefined) state.lastOffersTime = 0;
+            if (state.activeOffers === undefined) state.activeOffers = [];
+            if (state.claimedOffers === undefined || state.claimedOffers.length < 4) state.claimedOffers = [false, false, false, false];
+
             let today = new Date().toDateString();
             if (state.lastOpenedDay !== today) {
                 state.lastOpenedDay = today;
-                state.packsCount = 2;
+                state.packsCount = 3; 
                 saveState();
             }
             refreshGlobalCounters();
@@ -540,7 +630,10 @@
 
         function refreshGlobalCounters() {
             let totalPasted = Object.keys(state.pasted).filter(id => state.pasted[id]).length;
-            document.getElementById('global-stats').innerText = `Progreso: ${totalPasted}/225`;
+            document.getElementById('global-stats').innerText = `Progreso: ${totalPasted}/${stickerList.length}`;
+            if(document.getElementById('gems-stats')) {
+                document.getElementById('gems-stats').innerText = `💎 ${state.gems} Gemas`;
+            }
         }
 
         function navigateTo(tabName) {
@@ -612,94 +705,103 @@
         }
 
         function spinWheel() {
-    document.getElementById('spin-btn').disabled = true;
-    let wheel = document.getElementById('main-wheel');
-    
-    // Generamos un número del 0 al 99.99
-    let rand = Math.random() * 100;
-    let cardsCount, stopDeg;
+            document.getElementById('spin-btn').disabled = true;
+            let wheel = document.getElementById('main-wheel');
+            
+            let rand = Math.random() * 100;
+            let cardsCount, stopDeg;
 
-    // Función auxiliar para que la ruleta caiga en un ángulo aleatorio dentro de un rango seguro
-    const getRandomDeg = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+            const getRandomDeg = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+            
+            if(rand < 50) { 
+                cardsCount = 0; 
+                stopDeg = getRandomDeg(185, 355); 
+            }
+            else if(rand < 75) { 
+                cardsCount = 3; 
+                stopDeg = getRandomDeg(95, 175); 
+            }
+            else if(rand < 90) { 
+                cardsCount = 5; 
+                stopDeg = getRandomDeg(40, 85); 
+            }
+            else { 
+                cardsCount = 10; 
+                stopDeg = getRandomDeg(5, 30); 
+            }
 
-    /* LÓGICA CORREGIDA:
-       Como la ruleta gira hacia la derecha, el punto que queda debajo del puntero es: (360 - Ángulo).
-       Por tanto, si queremos que caiga en el Azul (0 a 180), el ángulo final debe tener un resto entre 180 y 360.
-    */
-    
-    if(rand < 50) { 
-        // 🟦 Azul (50% prob) - Sector visual: 0° a 180°
-        cardsCount = 1; 
-        stopDeg = getRandomDeg(185, 355); // Margen para no pisar la línea
-    }
-    else if(rand < 75) { 
-        // 🟩 Verde (25% prob) - Sector visual: 180° a 270°
-        cardsCount = 3; 
-        stopDeg = getRandomDeg(95, 175); 
-    }
-    else if(rand < 90) { 
-        // 🟪 Morado (15% prob) - Sector visual: 270° a 324°
-        cardsCount = 5; 
-        stopDeg = getRandomDeg(40, 85); 
-    }
-    else { 
-        // 🟧 Naranja (10% prob) - Sector visual: 324° a 360°
-        cardsCount = 10; 
-        stopDeg = getRandomDeg(5, 30); 
-    }
+            let finalDeg = 1800 + stopDeg;
+            wheel.style.transform = `rotate(${finalDeg}deg)`;
 
-    // Le damos 5 vueltas de inercia (1800 grados) + el grado donde debe frenar
-    let finalDeg = 1800 + stopDeg;
-    wheel.style.transform = `rotate(${finalDeg}deg)`;
-
-    setTimeout(() => {
-        state.lastWheelDay = new Date().toDateString();
-        saveState();
-        
-        let zone = document.getElementById('reveal-zone');
-        zone.innerHTML = '';
-        document.getElementById('pack-modal-title').innerText = `¡Premio Ruleta: ${cardsCount} Cartas!`;
-
-        for (let i = 0; i < cardsCount; i++) {
-            let randomItem = stickerList[Math.floor(Math.random() * stickerList.length)];
-            state.inventory[randomItem.id] = (state.inventory[randomItem.id] || 0) + 1;
-            zone.innerHTML += `<div class="card-revealed">${randomItem.char}</div>`;
+            setTimeout(() => {
+                state.lastWheelDay = new Date().toDateString();
+                saveState();
+                
+                let zone = document.getElementById('reveal-zone');
+                zone.innerHTML = '';
+                
+                if(rand < 50) {
+                    state.gems += 3;
+                    document.getElementById('pack-modal-title').innerText = `¡Premio Ruleta: 3 Gemas! 💎`;
+                    zone.innerHTML = `<div style="font-size: 4.5rem; text-align: center; width:100%;">💎💎💎</div>`;
+                } else {
+                    document.getElementById('pack-modal-title').innerText = `¡Premio Ruleta: ${cardsCount} Cartas!`;
+                    for (let i = 0; i < cardsCount; i++) {
+                        let randomItem = normalStickers[Math.floor(Math.random() * normalStickers.length)];
+                        state.inventory[randomItem.id] = (state.inventory[randomItem.id] || 0) + 1;
+                        zone.innerHTML += `<div class="card-revealed">${randomItem.char}</div>`;
+                    }
+                }
+                
+                saveState();
+                document.getElementById('pack-modal').style.display = 'flex';
+                document.getElementById('spin-btn').disabled = false;
+                checkWheelView();
+            }, 4100);
         }
-        saveState();
-        document.getElementById('pack-modal').style.display = 'flex';
-        document.getElementById('spin-btn').disabled = false;
-        
-        // ¡Nota! Hemos eliminado el reinicio a 'rotate(0deg)'. 
-        // Como el usuario solo tira 1 vez al día, es mejor que la ruleta se quede 
-        // donde paró. Si la recargan al día siguiente, empezará desde 0 sola.
-        
-        checkWheelView();
-    }, 4100);
-}
 
         function buildRepesView() {
-            let listElement = document.getElementById('repes-display-list');
-            listElement.innerHTML = '';
+            let sinPegarList = document.getElementById('sin-pegar-display-list');
+            let repesList = document.getElementById('repes-display-list');
+            
+            sinPegarList.innerHTML = '';
+            repesList.innerHTML = '';
+            
             let totalRepes = 0;
+            let countSinPegar = 0;
 
             stickerList.forEach(s => {
-                let count = state.inventory[s.id] || 0;
+                let totalQty = state.inventory[s.id] || 0;
                 let isPasted = state.pasted[s.id];
-                let repes = isPasted ? count - 1 : count;
 
-                if(repes > 0) {
-                    totalRepes += repes;
-                    listElement.innerHTML += `
+                if (!isPasted && totalQty > 0) {
+                    countSinPegar++;
+                    sinPegarList.innerHTML += `
                         <div class="repes-item">
-                            <span>${s.char} <small style="color:#a0aec0; margin-left: 5px;">(${s.category})</small></span>
-                            <b style="color:#2b6cb0; background:#ebf8ff; padding:2px 8px; border-radius:6px; font-size:0.85rem;">x${repes}</b>
+                            <span>${s.char} <small style="color:#a0aec0; margin-left: 4px;">(${s.category})</small></span>
+                            <button class="btn-nav" style="padding: 2px 8px; font-size: 0.75rem;" onclick="pasteAction(${s.id}); buildRepesView();">Pegar ya</button>
+                        </div>`;
+                }
+
+                let exactRepes = isPasted ? totalQty - 1 : (totalQty > 0 ? totalQty - 1 : 0);
+
+                if (exactRepes > 0) {
+                    totalRepes += exactRepes;
+                    repesList.innerHTML += `
+                        <div class="repes-item">
+                            <span>${s.char} <small style="color:#a0aec0; margin-left: 4px;">(${s.category})</small></span>
+                            <b style="color:#2b6cb0; background:#ebf8ff; padding:2px 8px; border-radius:6px; font-size:0.85rem;">x${exactRepes}</b>
                         </div>`;
                 }
             });
 
-            document.getElementById('repes-total-counter').innerText = `Total: ${totalRepes}`;
-            if(totalRepes === 0) {
-                listElement.innerHTML = '<p style="text-align:center; opacity:0.4; margin-top:30px; font-size:0.9rem;">No posees cromos repetidos aún.</p>';
+            document.getElementById('repes-total-counter').innerText = `Repes: ${totalRepes}`;
+            
+            if (countSinPegar === 0) {
+                sinPegarList.innerHTML = '<p style="text-align:center; opacity:0.4; padding: 10px; font-size:0.85rem; margin:0;">No tienes cromos sin pegar.</p>';
+            }
+            if (totalRepes === 0) {
+                repesList.innerHTML = '<p style="text-align:center; opacity:0.4; padding: 10px; font-size:0.85rem; margin:0;">No tienes cromos repetidos.</p>';
             }
         }
 
@@ -707,26 +809,30 @@
             let headline = document.getElementById('pack-headline');
             let element = document.getElementById('pack-element');
             if (state.packsCount > 0) {
-                headline.innerText = `¡Tienes ${state.packsCount} sobre(s) disponible(s) hoy!`;
+                headline.innerText = `¡Tienes ${state.packsCount} sobre(s) de 5 cartas gratis hoy!`;
                 element.style.opacity = "1";
             } else {
-                headline.innerText = "No te quedan sobres. ¡Vuelve mañana!";
+                headline.innerText = "No te quedan sobres diarios.";
                 element.style.opacity = "0.35";
             }
+            checkAndGenerateOffers();
+            displayBrawlOffers();
+            runCountdowns();
         }
 
         function openPack() {
             if (state.packsCount <= 0) return;
             state.packsCount--;
+            state.gems += 1; 
             saveState();
             buildPacksView();
 
             let zone = document.getElementById('reveal-zone');
             zone.innerHTML = '';
-            document.getElementById('pack-modal-title').innerText = "¡Sobre Abierto! (5 Cartas)";
+            document.getElementById('pack-modal-title').innerText = "¡Sobre Abierto! (5 Cartas + 1 💎)";
 
             for (let i = 0; i < 5; i++) {
-                let randomItem = stickerList[Math.floor(Math.random() * stickerList.length)];
+                let randomItem = normalStickers[Math.floor(Math.random() * normalStickers.length)];
                 state.inventory[randomItem.id] = (state.inventory[randomItem.id] || 0) + 1;
                 
                 setTimeout(() => {
@@ -736,6 +842,209 @@
             saveState();
             document.getElementById('pack-modal').style.display = 'flex';
         }
+
+        // --- TIENDA PERMANENTE (COMPRA CON GEMAS) ---
+        function buyStandardPack(packSize, price) {
+            if (state.gems < price) {
+                alert("❌ ¡No tienes suficientes gemas!");
+                return;
+            }
+            state.gems -= price;
+            saveState();
+
+            let zone = document.getElementById('reveal-zone');
+            zone.innerHTML = '';
+            document.getElementById('pack-modal-title').innerText = `Sobre Comprado (${packSize} Cartas)`;
+
+            for (let i = 0; i < packSize; i++) {
+                let randomItem = normalStickers[Math.floor(Math.random() * normalStickers.length)];
+                state.inventory[randomItem.id] = (state.inventory[randomItem.id] || 0) + 1;
+                zone.innerHTML += `<div class="card-revealed">${randomItem.char}</div>`;
+            }
+            saveState();
+            document.getElementById('pack-modal').style.display = 'flex';
+            buildPacksView();
+        }
+
+        // --- MECÁNICA DE RECICLAJE (CONSEGUIR GEMAS) ---
+        function recycleDuplicatesForGems() {
+            let duplicates = [];
+            stickerList.forEach(s => {
+                let totalQty = state.inventory[s.id] || 0;
+                let isPasted = state.pasted[s.id];
+                let exactRepes = isPasted ? totalQty - 1 : (totalQty > 0 ? totalQty - 1 : 0);
+                
+                for (let k = 0; k < exactRepes; k++) {
+                    duplicates.push(s.id);
+                }
+            });
+
+            if (duplicates.length < 5) {
+                alert(`❌ Necesitas al menos 5 cromos repetidos para reciclar. ¡Actualmente tienes ${duplicates.length}!`);
+                return;
+            }
+
+            // Eliminar 5 repetidos del inventario
+            for (let i = 0; i < 5; i++) {
+                let idToRemove = duplicates[i];
+                state.inventory[idToRemove]--;
+            }
+
+            state.gems += 2;
+            saveState();
+            alert("♻️ ¡Reciclaje completado con éxito! Entregaste 5 repetidos y recibiste 💎 2 Gemas.");
+            buildPacksView();
+        }
+
+        // --- SISTEMA ROTATIVO DE OFERTAS (3 DÍAS) ---
+        function checkAndGenerateOffers() {
+            let cooldown = 3 * 24 * 60 * 60 * 1000; 
+            if (!state.lastOffersTime || (Date.now() - state.lastOffersTime >= cooldown) || !state.activeOffers || state.activeOffers.length === 0) {
+                state.lastOffersTime = Date.now();
+                state.claimedOffers = [false, false, false, false];
+                
+                let exc1 = exclusiveStickers[Math.floor(Math.random() * exclusiveStickers.length)];
+                let exc2 = exclusiveStickers[Math.floor(Math.random() * exclusiveStickers.length)];
+                
+                state.activeOffers = [
+                    {
+                        type: 'big_pack',
+                        title: '🎁 ¡Sobre Gigante GRATIS!',
+                        packs: [10], 
+                        price: 0, 
+                        desc: '¡Un sobre masivo con 10 cromos aleatorios cada 3 días!'
+                    },
+                    {
+                        type: 'exclusive',
+                        title: '👑 Cromo Exclusivo Directo',
+                        stickerId: exc1.id,
+                        price: 12, 
+                        desc: `Adquiere directamente a ${exc1.char} sin repetidos`
+                    },
+                    {
+                        type: 'combo_packs',
+                        title: '📦 Megalote Sobres Mixtos',
+                        packs: [3, 5], 
+                        price: 7, 
+                        desc: 'Contiene 1 sobre de 3 cromos + 1 sobre de 5 cromos'
+                    },
+                    {
+                        type: 'mega_brawl',
+                        title: '🔥 Oferta Combo Legendario',
+                        stickerId: exc2.id, 
+                        packs: [5],
+                        price: 14, 
+                        desc: `Consigue a ${exc2.char} exclusivo + 1 sobre de 5 cromos`
+                    }
+                ];
+                saveState();
+            }
+        }
+
+        function displayBrawlOffers() {
+            let container = document.getElementById('brawl-offers-container');
+            if (!container) return;
+            
+            container.innerHTML = state.activeOffers.map((offer, idx) => {
+                let isClaimed = state.claimedOffers[idx];
+                let isFree = offer.price === 0;
+                
+                let btnText = isClaimed ? "RECLAMADO" : (isFree ? "GRATIS" : `💎 ${offer.price}`);
+                let btnStyle = isClaimed 
+                    ? "background: #cbd5e0; color: #718096; cursor: not-allowed;" 
+                    : (isFree ? "background: #48bb78; color: white; box-shadow: 0 3px 0 #22543d; width: 90px;" : "background: #e53e3e; color: white; box-shadow: 0 3px 0 #9b2c2c; width: 90px;");
+                    
+                return `
+                    <div style="background: white; border-radius: var(--radius-md); padding: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #feb2b2;">
+                        <div style="text-align: left; max-width: calc(100% - 100px);">
+                            <div style="font-weight: bold; font-size: 0.85rem; color: #2d3748;">${offer.title}</div>
+                            <div style="font-size: 0.75rem; color: #4a5568; margin-top: 2px;">${offer.desc}</div>
+                        </div>
+                        <button class="btn-main" style="margin:0; padding: 6px 0; font-size: 0.85rem; ${btnStyle}" onclick="buyOffer(${idx})" ${isClaimed ? 'disabled' : ''}>
+                            ${btnText}
+                        </button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function buyOffer(index) {
+            let offer = state.activeOffers[index];
+            if (!offer || state.claimedOffers[index]) return;
+            
+            if (state.gems < offer.price) {
+                alert("❌ ¡No tienes gemas suficientes para adquirir esta oferta!");
+                return;
+            }
+            
+            state.gems -= offer.price;
+            state.claimedOffers[index] = true;
+            
+            let zone = document.getElementById('reveal-zone');
+            zone.innerHTML = '';
+            document.getElementById('pack-modal-title').innerText = `¡Oferta Desbloqueada!`;
+            
+            if (offer.type === 'exclusive' || offer.type === 'mega_brawl') {
+                let s = stickerList.find(item => item.id === offer.stickerId);
+                state.inventory[s.id] = (state.inventory[s.id] || 0) + 1;
+                zone.innerHTML += `<div class="card-revealed" style="border-color: #d69e2e; background: #fffdf5;">${s.char}</div>`;
+            }
+            
+            if (offer.packs) {
+                offer.packs.forEach(packSize => {
+                    for (let i = 0; i < packSize; i++) {
+                        let randomItem = normalStickers[Math.floor(Math.random() * normalStickers.length)];
+                        state.inventory[randomItem.id] = (state.inventory[randomItem.id] || 0) + 1;
+                        zone.innerHTML += `<div class="card-revealed">${randomItem.char}</div>`;
+                    }
+                });
+            }
+            
+            saveState();
+            document.getElementById('pack-modal').style.display = 'flex';
+            buildPacksView();
+        }
+
+        function runCountdowns() {
+            let now = new Date();
+            
+            let midnight = new Date();
+            midnight.setHours(24, 0, 0, 0);
+            let diffDaily = midnight - now;
+
+            let h = Math.floor(diffDaily / (1000 * 60 * 60));
+            let m = Math.floor((diffDaily % (1000 * 60 * 60)) / (1000 * 60));
+            let s = Math.floor((diffDaily % (1000 * 60)) / 1000);
+            let dailyTimeStr = `Nuevos sobres en: ${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+
+            if(document.getElementById('daily-packs-countdown-text')) {
+                document.getElementById('daily-packs-countdown-text').innerText = dailyTimeStr;
+            }
+            if(document.getElementById('wheel-countdown-text')) {
+                document.getElementById('wheel-countdown-text').innerText = dailyTimeStr;
+            }
+
+            let offersText = document.getElementById('offers-countdown-text');
+            if (offersText && state.lastOffersTime) {
+                let cooldownOffers = 3 * 24 * 60 * 60 * 1000;
+                let nextOffers = state.lastOffersTime + cooldownOffers;
+                let diffOffers = nextOffers - Date.now();
+
+                if (diffOffers <= 0) {
+                    offersText.innerText = "¡Actualizando nuevas ofertas!";
+                    checkAndGenerateOffers();
+                    displayBrawlOffers();
+                } else {
+                    let dOff = Math.floor(diffOffers / (1000 * 60 * 60 * 24));
+                    let hOff = Math.floor((diffOffers % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    let mOff = Math.floor((diffOffers % (1000 * 60 * 60)) / (1000 * 60));
+                    let sOff = Math.floor((diffOffers % (1000 * 60)) / 1000);
+                    offersText.innerText = `Nuevas ofertas en: ${dOff}d ${hOff.toString().padStart(2, '0')}h ${mOff.toString().padStart(2, '0')}m ${sOff.toString().padStart(2, '0')}s`;
+                }
+            }
+        }
+
+        setInterval(runCountdowns, 1000);
 
         function closePackModal() {
             document.getElementById('pack-modal').style.display = 'none';
@@ -758,11 +1067,41 @@
             let rawCode = inputField.value.trim();
             if (!rawCode) return alert("Pega un código de respaldo.");
 
+            // --- ATAJO DEL CÓDIGO MAESTRO ---
+            if (rawCode === "TODO-COMPLETO-1000") {
+                let cheatState = {
+                    inventory: {},
+                    pasted: {},
+                    lastOpenedDay: new Date().toDateString(),
+                    packsCount: 0,
+                    lastWheelDay: new Date().toDateString(),
+                    gems: 1000,
+                    lastOffersTime: Date.now(),
+                    activeOffers: [],
+                    claimedOffers: [false, false, false, false]
+                };
+                for(let i = 1; i <= 235; i++) {
+                    cheatState.pasted[i] = true;
+                    cheatState.inventory[i] = 11; // 1 pegado + 10 repetidos exactos
+                }
+                state = cheatState;
+                saveState();
+                buildAlbumView();
+                inputField.value = '';
+                alert("🏆 ¡Modo Dios Activado! Álbum al 100%, 10 repes de cada cromo y 1000 gemas añadidas.");
+                navigateTo('album');
+                return;
+            }
+
             try {
                 let decodedString = decodeURIComponent(escape(atob(rawCode)));
                 let parsedState = JSON.parse(decodedString);
                 if (parsedState.inventory && parsedState.pasted) {
                     state = parsedState;
+                    if (state.gems === undefined) state.gems = 0;
+                    if (state.lastOffersTime === undefined) state.lastOffersTime = 0;
+                    if (state.activeOffers === undefined) state.activeOffers = [];
+                    if (state.claimedOffers === undefined || state.claimedOffers.length < 4) state.claimedOffers = [false, false, false, false];
                     saveState();
                     buildAlbumView();
                     inputField.value = '';
@@ -836,7 +1175,6 @@
             }
         }
 
-        // Lanzamiento automático
         loadState();
         buildAlbumView();
     </script>
