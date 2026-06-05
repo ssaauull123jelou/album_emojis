@@ -43,7 +43,6 @@
             color: var(--text-main);
         }
 
-        /* Layout Fijo Anti-Scroll */
         header {
             height: var(--header-h);
             background: var(--card-bg);
@@ -118,7 +117,6 @@
             padding-left: 8px;
         }
 
-        /* Cuadrícula Adaptativa 3x5 */
         .album-nav {
             display: flex;
             justify-content: space-between;
@@ -203,7 +201,59 @@
             cursor: pointer;
         }
 
-        /* Ruleta Diaria */
+        .recycle-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+            margin: 8px 0;
+            max-height: 180px;
+            overflow-y: auto;
+            padding: 4px;
+            background: #ffffff;
+            border-radius: var(--radius-md);
+            border: 1px solid #e2e8f0;
+        }
+
+        .recycle-slot {
+            background: #f7fafc;
+            border: 1px solid #cbd5e0;
+            border-radius: var(--radius-md);
+            padding: 6px 4px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .recycle-slot.disabled {
+            opacity: 0.4;
+            background: #edf2f7;
+            border: 1px dashed #cbd5e0;
+        }
+
+        .recycle-slot .emoji-pic {
+            font-size: 1.4rem;
+            margin-bottom: 2px;
+        }
+
+        .recycle-slot small {
+            font-size: 0.65rem;
+            color: #718096;
+            font-weight: bold;
+        }
+
+        .recycle-slot input {
+            width: 85%;
+            padding: 2px;
+            margin: 3px 0 0 0;
+            font-size: 0.75rem;
+            text-align: center;
+            border: 1px solid #cbd5e0;
+            border-radius: 4px;
+            background: white;
+        }
+
         .wheel-container {
             display: flex;
             flex-direction: column;
@@ -241,7 +291,6 @@
             z-index: 10;
         }
 
-        /* Gestión de Repetidas */
         .repes-container {
             display: flex;
             flex-direction: column;
@@ -264,7 +313,6 @@
             border-bottom: 1px solid #f7fafc;
         }
 
-        /* Paneles Escroleables */
         .scrollable-panel {
             overflow-y: auto;
             flex-grow: 1;
@@ -293,7 +341,6 @@
             font-size: 0.9rem;
         }
 
-        /* Barra de Navegación Fija */
         nav {
             position: absolute;
             bottom: 0;
@@ -325,7 +372,6 @@
         nav button span { font-size: 1.2rem; margin-bottom: 2px; opacity: 0.6; }
         nav button.active span { opacity: 1; }
 
-        /* Modales */
         #pack-modal {
             display: none;
             position: fixed;
@@ -462,14 +508,14 @@
                     <p style="color:#718096; font-size:0.75rem; margin: 4px 0 0 0;">¡Cada sobre abierto te otorga +1 💎 gema de bonus!</p>
                 </div>
 
-                <!-- SECCIÓN 2: OFERTAS ESPECIALES LIMITADAS (ROTACIÓN 3 DÍAS) -->
+                <!-- SECCIÓN 2: OFERTAS ESPECIALES LIMITADAS -->
                 <div class="card" style="background: linear-gradient(135deg, #fff5f5 0%, #fed7d7 100%); border: 2px solid #f56565; padding: 12px 10px; margin-bottom: 12px;">
                     <h2 style="border:none; text-align:center; padding:0; font-size: 1rem; color: #c53030; font-weight: 800; margin-bottom: 2px;">🔥 Ofertas Especiales Limitadas 🔥</h2>
                     <div class="timer-badge" id="offers-countdown-text" style="text-align:center; margin-bottom: 8px; color: #c53030;"></div>
                     <div id="brawl-offers-container" style="display: flex; flex-direction: column; gap: 8px;"></div>
                 </div>
 
-                <!-- SECCIÓN 3: TIENDA PERMANENTE DE SOBRES (COMPRA CON GEMAS) -->
+                <!-- SECCIÓN 3: TIENDA PERMANENTE DE SOBRES -->
                 <div class="card" style="margin-bottom: 12px;">
                     <h2>🛒 Compra de Sobres Permanente</h2>
                     <p style="color:#718096; font-size:0.75rem; margin: -4px 0 8px 0;">Disponibles siempre que tengas gemas suficientes.</p>
@@ -489,12 +535,23 @@
                     </div>
                 </div>
 
-                <!-- SECCIÓN 4: BANCO DE INTERCAMBIO (REPETIDOS POR GEMAS) -->
-                <div class="card" style="background: #f0fff4; border: 1px solid #c6f6d5; text-align: center; padding: 10px;">
-                    <h2 style="border:none; text-align:center; padding:0; font-size: 0.95rem; color: #22543d;">♻️ Casa de Empeño de Cromos</h2>
-                    <p style="color:#48bb78; font-size:0.75rem; margin: 2px 0 6px 0; font-weight: 600;">¿Te faltan gemas? ¡Recicla tus repetidos!</p>
-                    <button class="btn-main" style="background: var(--pastel-green); color: #22543d;" onclick="recycleDuplicatesForGems()">
-                        Vender 5 Repetidos ➔ Ganar 💎 2 Gemas
+                <!-- SECCIÓN 4: PANEL DE RECICLAJE EN CUADRÍCULA MASIVA -->
+                <div class="card" style="background: #f0fff4; border: 1px solid #c6f6d5; padding: 12px;">
+                    <h2 style="border:none; text-align:center; padding:0; font-size: 0.95rem; color: #22543d; margin-bottom: 4px;">♻️ Centro de Reciclaje por Lotes</h2>
+                    <p style="color:#48bb78; font-size:0.72rem; margin: 2px 0 8px 0; font-weight: 600; text-align: center;">Añade copias al lote desde la cuadrícula (Cada 5 cromos = 2 💎)</p>
+                    
+                    <div class="album-nav" style="margin-bottom: 4px;">
+                        <button class="btn-nav" style="padding: 2px 10px; font-size: 0.8rem;" onclick="changeRecycleCategory(-1)">◀</button>
+                        <span class="cat-title" id="display-recycle-cat" style="font-size: 0.8rem; padding: 4px 10px;">Cargando...</span>
+                        <button class="btn-nav" style="padding: 2px 10px; font-size: 0.8rem;" onclick="changeRecycleCategory(1)">▶</button>
+                    </div>
+                    
+                    <div class="recycle-grid" id="recycle-grid"></div>
+                    
+                    <p id="recycle-summary-text" style="font-size:0.8rem; font-weight:bold; color:#2b6cb0; margin: 8px 0; text-align:center;">Total seleccionados: 0 cromos -> Ganas: 💎 0 Gemas</p>
+                    
+                    <button class="btn-main" style="background: var(--pastel-green); color: #22543d;" onclick="executeMultiRecycle()">
+                        Destruir Lote Seleccionado
                     </button>
                 </div>
 
@@ -544,7 +601,6 @@
     </div>
 
     <script>
-        // --- CONFIGURACIÓN DE FIREBASE REALTIME DATABASE ---
         const firebaseConfig = {
             apiKey: "AIzaSyAxqCOJmNhaa0DCTgweiQE3sbYHC7qkc0",
             authDomain: "album-emojis.firebaseapp.com",
@@ -580,7 +636,9 @@
         const stickerList = [];
         const categoryNames = Object.keys(categoriesData);
         let activeCatIndex = 0;
+        let recycleCatIndex = 0;
         let globalCounter = 1;
+        let recycleCart = {};
 
         for (let [cat, items] of Object.entries(categoriesData)) {
             items.split(',').forEach(emoji => {
@@ -637,17 +695,21 @@
         }
 
         function navigateTo(tabName) {
+            // Cambio visual inmediato sin esperar procesamiento de datos para eliminar el lag
             document.querySelectorAll('.container').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('nav button').forEach(el => el.classList.remove('active'));
             
             document.getElementById('tab-' + tabName).classList.add('active');
             document.getElementById('nav-' + tabName).classList.add('active');
 
-            if(tabName === 'album') buildAlbumView();
-            if(tabName === 'wheel') checkWheelView();
-            if(tabName === 'repes') buildRepesView();
-            if(tabName === 'packs') buildPacksView();
-            if(tabName === 'trade') buildTradeView();
+            // Carga de procesos asíncrona parcial ligera
+            setTimeout(() => {
+                if(tabName === 'album') buildAlbumView();
+                if(tabName === 'wheel') checkWheelView();
+                if(tabName === 'repes') buildRepesView();
+                if(tabName === 'packs') buildPacksView();
+                if(tabName === 'trade') buildTradeView();
+            }, 1);
         }
 
         function changeCategory(direction) {
@@ -817,6 +879,7 @@
             }
             checkAndGenerateOffers();
             displayBrawlOffers();
+            buildRecycleGridView();
             runCountdowns();
         }
 
@@ -843,7 +906,6 @@
             document.getElementById('pack-modal').style.display = 'flex';
         }
 
-        // --- TIENDA PERMANENTE (COMPRA CON GEMAS) ---
         function buyStandardPack(packSize, price) {
             if (state.gems < price) {
                 alert("❌ ¡No tienes suficientes gemas!");
@@ -866,37 +928,95 @@
             buildPacksView();
         }
 
-        // --- MECÁNICA DE RECICLAJE (CONSEGUIR GEMAS) ---
-        function recycleDuplicatesForGems() {
-            let duplicates = [];
-            stickerList.forEach(s => {
+        function changeRecycleCategory(direction) {
+            recycleCatIndex = (recycleCatIndex + direction + categoryNames.length) % categoryNames.length;
+            buildRecycleGridView();
+        }
+
+        function buildRecycleGridView() {
+            let currentCat = categoryNames[recycleCatIndex];
+            document.getElementById('display-recycle-cat').innerText = currentCat;
+
+            let catStickers = stickerList.filter(s => s.category === currentCat);
+            let grid = document.getElementById('recycle-grid');
+            if(!grid) return;
+
+            grid.innerHTML = catStickers.map(s => {
                 let totalQty = state.inventory[s.id] || 0;
                 let isPasted = state.pasted[s.id];
                 let exactRepes = isPasted ? totalQty - 1 : (totalQty > 0 ? totalQty - 1 : 0);
-                
-                for (let k = 0; k < exactRepes; k++) {
-                    duplicates.push(s.id);
-                }
-            });
 
-            if (duplicates.length < 5) {
-                alert(`❌ Necesitas al menos 5 cromos repetidos para reciclar. ¡Actualmente tienes ${duplicates.length}!`);
+                let currentCartVal = recycleCart[s.id] || 0;
+
+                if (exactRepes <= 0) {
+                    return `
+                        <div class="recycle-slot disabled">
+                            <span class="emoji-pic">${s.char}</span>
+                            <small>Sobrante: 0</small>
+                            <input type="number" disabled value="0">
+                        </div>`;
+                } else {
+                    return `
+                        <div class="recycle-slot">
+                            <span class="emoji-pic">${s.char}</span>
+                            <small style="color: #2b6cb0;">Repes: ${exactRepes}</small>
+                            <input type="number" min="0" max="${exactRepes}" value="${currentCartVal}" 
+                                   oninput="updateRecycleCart(${s.id}, this.value, ${exactRepes})">
+                        </div>`;
+                }
+            }).join('');
+            
+            updateRecycleSummary();
+        }
+
+        function updateRecycleCart(id, value, maxVal) {
+            let qty = parseInt(value) || 0;
+            if (qty > maxVal) qty = maxVal;
+            if (qty < 0) qty = 0;
+
+            if (qty === 0) {
+                delete recycleCart[id];
+            } else {
+                recycleCart[id] = qty;
+            }
+            updateRecycleSummary();
+        }
+
+        function updateRecycleSummary() {
+            let totalCromos = 0;
+            for (let id in recycleCart) {
+                totalCromos += recycleCart[id];
+            }
+            let gemsGained = Math.floor(totalCromos * 0.4); 
+            document.getElementById('recycle-summary-text').innerText = 
+                `Total seleccionados: ${totalCromos} cromos -> Ganas: 💎 ${gemsGained} Gemas`;
+        }
+
+        function executeMultiRecycle() {
+            let totalCromos = 0;
+            for (let id in recycleCart) {
+                totalCromos += recycleCart[id];
+            }
+
+            if (totalCromos === 0) {
+                alert("❌ No has añadido ningún cromo repetido al lote de reciclaje.");
                 return;
             }
 
-            // Eliminar 5 repetidos del inventario
-            for (let i = 0; i < 5; i++) {
-                let idToRemove = duplicates[i];
-                state.inventory[idToRemove]--;
+            let gemsGained = Math.floor(totalCromos * 0.4);
+
+            for (let id in recycleCart) {
+                state.inventory[id] -= recycleCart[id];
             }
 
-            state.gems += 2;
+            state.gems += gemsGained;
+            recycleCart = {}; 
             saveState();
-            alert("♻️ ¡Reciclaje completado con éxito! Entregaste 5 repetidos y recibiste 💎 2 Gemas.");
-            buildPacksView();
+
+            alert(`♻️ ¡Lote reciclado con éxito! Destruiste ${totalCromos} cromos sobrantes y sumaste 💎 ${gemsGained} Gemas.`);
+            buildPacksView(); 
         }
 
-        // --- SISTEMA ROTATIVO DE OFERTAS (3 DÍAS) ---
         function checkAndGenerateOffers() {
             let cooldown = 3 * 24 * 60 * 60 * 1000; 
             if (!state.lastOffersTime || (Date.now() - state.lastOffersTime >= cooldown) || !state.activeOffers || state.activeOffers.length === 0) {
@@ -1048,7 +1168,8 @@
 
         function closePackModal() {
             document.getElementById('pack-modal').style.display = 'none';
-            navigateTo('album');
+            let activeTab = document.querySelector('nav button.active').id.replace('nav-', '');
+            navigateTo(activeTab);
         }
 
         function exportBackupCode() {
@@ -1067,7 +1188,6 @@
             let rawCode = inputField.value.trim();
             if (!rawCode) return alert("Pega un código de respaldo.");
 
-            // --- ATAJO DEL CÓDIGO MAESTRO ---
             if (rawCode === "TODO-COMPLETO-1000") {
                 let cheatState = {
                     inventory: {},
@@ -1082,14 +1202,13 @@
                 };
                 for(let i = 1; i <= 235; i++) {
                     cheatState.pasted[i] = true;
-                    cheatState.inventory[i] = 11; // 1 pegado + 10 repetidos exactos
+                    cheatState.inventory[i] = 11; 
                 }
                 state = cheatState;
                 saveState();
-                buildAlbumView();
                 inputField.value = '';
                 alert("🏆 ¡Modo Dios Activado! Álbum al 100%, 10 repes de cada cromo y 1000 gemas añadidas.");
-                navigateTo('album');
+                navigateTo('trade'); 
                 return;
             }
 
@@ -1103,9 +1222,10 @@
                     if (state.activeOffers === undefined) state.activeOffers = [];
                     if (state.claimedOffers === undefined || state.claimedOffers.length < 4) state.claimedOffers = [false, false, false, false];
                     saveState();
-                    buildAlbumView();
                     inputField.value = '';
                     alert("¡Álbum cargado con éxito!");
+                    let activeTab = document.querySelector('nav button.active').id.replace('nav-', '');
+                    navigateTo(activeTab);
                 }
             } catch(e) {
                 alert("Código dañado o inválido.");
